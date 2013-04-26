@@ -1,0 +1,11 @@
+<h1>GPX Data</h1>
+<div id="content"></div>
+
+<script>
+$(function(){
+	var gpxes = <%= @gpxes.to_json.html_safe %>
+	var $rootEl = $('#content');
+	window.CA.initialize($rootEl, gpxes);
+	
+});
+</script>

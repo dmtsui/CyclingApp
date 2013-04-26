@@ -1,9 +1,13 @@
 class GpxesController < ApplicationController
   respond_to :json
+  respond_to :html, only:[:index]
   
   def index
     @gpxes = Gpx.includes(:wpts).includes(:bound).all
-    render json: @gpxes
+    respond_to do |format|
+      format.html { render :index }
+      format.json { render json: @gpxes }
+    end
   end
   
   def create
