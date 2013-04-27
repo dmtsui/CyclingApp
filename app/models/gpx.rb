@@ -8,6 +8,8 @@ class Gpx < ActiveRecord::Base
   has_one :bound, inverse_of: :gpx
   has_many :wpts, inverse_of: :gpx
   
+  before_filter :
+  
   def self.make(gpx_file)
     gpx_hash = Hash.from_xml(File.open("#{Rails.root}/#{gpx_file}"))
     
