@@ -3,17 +3,14 @@
 
 <script>
 $(function(){
-	var gpxes = <%= @gpxes[0].to_json.html_safe %>;
-	console.log(gpxes);
-		   
+				<%   gpxes = []  %>
+				<%   @gpxes.each { |gpx| gpxes << JSON.parse(gpx[:data]) } %>
+	var gpxes = <%=  gpxes.to_json.html_safe %>;
+	
 	var $rootEl = $('#content');
 	
-	CA.Store.Gpx = new CA.Models.Gpx(gpxes);
-	
-	
-	// CA.Store.Wpts = new CA.Collections.Wpts(wpts);
-	// CA.Store.Bounds = new CA.Collections.Bounds(bounds);
-	
+	CA.Store.Gpxes = new CA.Collections.Gpxes(gpxes);
+
 	window.CA.initialize($rootEl);
 	
 });

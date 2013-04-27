@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130426182119) do
+ActiveRecord::Schema.define(:version => 20130427031118) do
 
   create_table "bounds", :force => true do |t|
     t.float    "minlat"
@@ -26,11 +26,9 @@ ActiveRecord::Schema.define(:version => 20130426182119) do
   add_index "bounds", ["gpx_id"], :name => "index_bounds_on_gpx_id"
 
   create_table "gpxes", :force => true do |t|
-    t.string   "version"
-    t.string   "creator"
-    t.datetime "time",       :null => false
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.text     "data"
   end
 
   create_table "wpts", :force => true do |t|
