@@ -2,7 +2,7 @@ class WptsController < ApplicationController
   respond_to :json
   
   def index
-    @wpts = Wpt.all
+    @wpts = Gpx.find(params[:gpx_id]).wpts
     render json: @wpts
   end
   

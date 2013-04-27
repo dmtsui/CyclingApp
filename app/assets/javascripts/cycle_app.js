@@ -5,8 +5,9 @@ window.CA = {
 	Routers: {},
 	Store: {},
 	
-	initialize: function($rootEl, gpxes){
-		console.log(gpxes);	
+	initialize: function($rootEl){
+		new CA.Routers.GpxRouter($rootEl);
+		Backbone.history.start();
 	}
 	
 }

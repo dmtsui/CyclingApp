@@ -3,7 +3,11 @@ class GpxesController < ApplicationController
   respond_to :html, only:[:index]
   
   def index
-    @gpxes = Gpx.includes(:wpts).includes(:bound).all
+    @gpxes = Gpx.includes(:wpts, :bound).all
+    @gpxes.map! do |gpx|
+      gpx.as_json(include: [:wpts, :bound])
+    end
+    
     respond_to do |format|
       format.html { render :index }
       format.json { render json: @gpxes }
@@ -21,6 +25,7 @@ class GpxesController < ApplicationController
   
   def show 
     @gpx = Gpx.find(params[:id])
+    p @gpx.to_json
     render json: @gpx
   end
   

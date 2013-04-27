@@ -3,9 +3,18 @@
 
 <script>
 $(function(){
-	var gpxes = <%= @gpxes.to_json.html_safe %>
+	var gpxes = <%= @gpxes[0].to_json.html_safe %>;
+	console.log(gpxes);
+		   
 	var $rootEl = $('#content');
-	window.CA.initialize($rootEl, gpxes);
+	
+	CA.Store.Gpx = new CA.Models.Gpx(gpxes);
+	
+	
+	// CA.Store.Wpts = new CA.Collections.Wpts(wpts);
+	// CA.Store.Bounds = new CA.Collections.Bounds(bounds);
+	
+	window.CA.initialize($rootEl);
 	
 });
 </script>
