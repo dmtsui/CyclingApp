@@ -1,0 +1,1 @@
+CA.Models.Rtept = Backbone.RelationalModel.extend({});
