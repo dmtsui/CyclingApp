@@ -16,7 +16,9 @@ class GpxesController < ApplicationController
   end
   
   def create
-    @gpx = Gpx.new(params[:gpx])
+    @gpx = Gpx.new()
+    @gpx.data = params['data']
+
     if @gpx.save
       render json: JSON.parse(@gpx[:data])
     else

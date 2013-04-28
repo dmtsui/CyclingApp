@@ -6,59 +6,107 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	events: {
-		"click svg": "setWpts"
+		"click button.drawElev": "drawElev"
 	},
 	
 	initialize: function(){
-		this.data = this.setWpts();
 		this.r = 10;
-		this.xRange;
-		this.yRange;
-		this.WIDTH = 600;
+		this.WIDTH = 1200;
 		this.HEIGHT = 400,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
 	},
 	
-	render: function(data){
+	render: function(data, xfunc, yfunc, xbound, ybound){
 		var that = this;
-		
-		that.setRange().setAxis().drawAxis();		
-		that.plotData(data);
+		that.addButtons();
+		that.setBounds(xbound, ybound).setAxis().drawAxis();		
+		that.plotData(data, xfunc, yfunc);
 		
 		return that;
 	},
 	
+	addButtons: function (){
+		var that = this;
+		var elevation = $('<button>').attr('class', 'drawElev').html('elevation');
+		var rtepts = $('<button>').attr('class', 'drawRtepts').html('route');
+		var wpts = $('<button>').attr('class', 'drawWpts').html('waypoints');
+		that.$el.append(elevation).append(rtepts);
+	},
+	
+	drawElev: function (){
+		console.log("button works")
+	},
+	
 	setRte: function(){
 		var that = this;
-		return that.model.get( 'rtes' ).first().get('rtepts').models;
+		that.data = that.model.get( 'rtes' ).first().get('rtepts').models;
+		return that.data;
 	},
 	
 	setWpts: function(){
 		var that = this;
-		return that.model.get( 'wpts' ).models;	
+		that.data = that.model.get( 'wpts' ).models;
+		return that.data;
 	},
 	
 	setElevation: function () {
-		
+		var that = this;
+		var data = [];
+		_.each(that.data, function(d){
+			data.push(parseFloat(d.get('ele')));
+		});
+		data.sort(function(a, b) {
+		    return a - b;
+		});
+		return [data.shift(), data.pop()];
 	},
 	
-	setRange: function (xbound, ybound){		
-		var that = this;
-		
-		xbound = xbound || d3.scale.linear()
-					.range ([that.MARGINS.left, that.WIDTH - that.MARGINS.left])
-					.domain([that.model.get('bound')
-							.get('minlat'), that.model.get('bound').get('maxlat')]);
-		
-		ybound = ybound || d3.scale.linear()
-					.range ([that.MARGINS.bottom, that.HEIGHT - that.MARGINS.bottom])
-					.domain([that.model.get('bound')
-							.get('minlon'), that.model.get('bound').get('maxlon')]);
+	setDistance: function () {
+		var that = this, last = null,
+			dList = [], current = null;
+			
+		_.each(that.data, function(node){
+			current = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
+			if (last == null){
+				dList.push(0)
+				node.set('dist', 0);
+			}else {
+				var dist = Math.sqrt(Math.pow((current[0]-last[0]), 2) + Math.pow((current[1]-last[1]), 2));
+				dist += dList[dList.length - 1];
+				dList.push(dist);
+				node.set('dist', dist);
+			}
+			last = current;
+			dList.sort(function(a, b) {
+			    return a - b;
+			});
+			
+		});
+		return [dList.shift(), dList.pop()];
+	},
 	
-		that.xRange = xbound;				
-		that.yRange = ybound;
+	setXMap: function(){
+		var that = this;
+		return [that.model.get('bound').get('minlat'), that.model.get('bound').get('maxlat')];
+	},
+	
+	setYMap: function(){
+		var that = this;
+		return [that.model.get('bound').get('minlon'), that.model.get('bound').get('maxlon')];
+	},
+	
+	setBounds: function (xbound, ybound){		
+		var that = this;
+							
+		that.xRange = d3.scale.linear()
+					.range ([that.MARGINS.left, that.WIDTH - that.MARGINS.left])
+					.domain(xbound);
 		
+		that.yRange = d3.scale.linear()
+					.range ([that.MARGINS.bottom, that.HEIGHT - that.MARGINS.bottom])
+					.domain(ybound);
+				
 		return that;	
 	},
 	
@@ -73,27 +121,37 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	drawAxis: function (){
 		var that = this;
 		
-		that.vis.append("svg:g").attr("class", "x axis")
+		that.vis.append("svg:g").attr("class", "x-axis")
 			.attr("transform", "translate(0,"+ (that.HEIGHT - that.MARGINS.bottom) +")").call(that.xAxis);
 			
-		that.vis.append("svg:g").attr("class", "y axis")
+		that.vis.append("svg:g").attr("class", "y-axis")
 			.attr("transform", "translate("+ (that.MARGINS.left) +", 0)").call(that.yAxis);
 		return that;		
 	},
 	
-	plotData: function (data){
+	plotData: function (data, xfunc, yfunc, xbound, ybound){
 		var that = this;
+		
+		if(xbound != undefined && ybound != undefined){
+			that.setBounds(xbound, ybound).setAxis();
+			that.vis.select('.x-axis').call(that.xAxis);
+			that.vis.select('.y-axis').call(that.yAxis);
+		}
 				
 		var circles = that.vis.selectAll("circle")
 					  .data(data, function (d) { return d.get('name') });
+			circles.transition().duration(1000)
+				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
+				.attr("cy", function (d) { return that.yRange ( yfunc(d) ) })
+				.attr("r", function (d) { return 7 });
 			circles.enter()
 				.insert("svg:circle")
 				.attr("cx", that.MARGINS.left)
 				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
 				.attr("r",0)
 				.transition().duration(1000)
-				.attr("cx", function (d) { return that.xRange (parseFloat(d.get('lat'))) })
-				.attr("cy", function (d) { return that.yRange (parseFloat(d.get('lon'))) })
+				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
+				.attr("cy", function (d) { return that.yRange ( yfunc(d) ) })
 				.attr("r", function (d) { return 7 });
 			circles.exit()
 				.transition().duration(1000)
@@ -102,7 +160,27 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				.attr("r",0)
 				.remove();
 		that.setAxis();
+	},
+	
+	setMapXRange: function(d){
+		return parseFloat(d.get('lat'));
+	},
+	
+	setMapYRange: function(d){
+		return parseFloat(d.get('lon'));
+	},
+	
+	setEle: function (d){
+		//console.log(d.get('ele'));
+		return parseFloat(d.get('ele'));
+	},
+	
+	setDist: function(d){
+		console.log(d.get('dist'));
+		return parseFloat(d.get('dist'));
 	}
+	
+	
 	
 	
 	
