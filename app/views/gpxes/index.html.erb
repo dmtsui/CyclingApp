@@ -1,11 +1,12 @@
-<h1>GPX Data</h1>
-<div id="content"></div>
+<h1 id="hedy">GPX Data</h1>
+<div id="content" class="container">
 
+</div>
+<svg width=600 height=400 class="outside-svg"></svg>
 <script>
 $(function(){
-				<%   gpxes = []  %>
-				<%   @gpxes.each { |gpx| gpxes << JSON.parse(gpx[:data]) } %>
-	var gpxes = <%=  gpxes.to_json.html_safe %>;
+
+	var gpxes = <%= @gpxes.to_json.html_safe %>
 	
 	var $rootEl = $('#content');
 	

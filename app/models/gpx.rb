@@ -16,7 +16,11 @@ class Gpx < ActiveRecord::Base
         bound: raw_data["gpx"]["bounds"]
     }
     clean_data[:wpts] = raw_data["gpx"]["wpt"] if raw_data["gpx"]["wpt"]
-    clean_data[:rtes] = raw_data["gpx"]["rtes"] if raw_data["gpx"]["rtes"]
+    if raw_data["gpx"]["rte"]
+      clean_data[:rtes] = raw_data["gpx"]["rte"]
+      clean_data[:rtes][:rtepts] =  raw_data["gpx"]["rte"]["rtept"]
+      clean_data[:rtes].delete("rtept")
+    end
 
     self.data = clean_data.to_json
   end

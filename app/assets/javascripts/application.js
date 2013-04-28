@@ -16,6 +16,7 @@
 //= require underscore
 //= require backbone
 //= require backbone-relational
+//= require d3
 
 //= require cycle_app
 

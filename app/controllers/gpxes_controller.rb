@@ -4,7 +4,11 @@ class GpxesController < ApplicationController
   
   def index
     @gpxes = Gpx.all
-    
+    @gpxes.map! do |gpx| 
+      data = JSON.parse(gpx[:data])
+      data[:id] = gpx[:id]
+      data
+    end
     respond_to do |format|
       format.html { render :index }
       format.json { render json: @gpxes }
@@ -14,7 +18,7 @@ class GpxesController < ApplicationController
   def create
     @gpx = Gpx.new(params[:gpx])
     if @gpx.save
-      render json: @gpx
+      render json: JSON.parse(@gpx[:data])
     else
       render json: @gpx.errors, status: 422
     end
@@ -22,8 +26,7 @@ class GpxesController < ApplicationController
   
   def show 
     @gpx = Gpx.find(params[:id])
-    p @gpx.to_json
-    render json: @gpx
+    render json: JSON.parse(@gpx[:data])
   end
   
   def destroy
