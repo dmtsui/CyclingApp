@@ -6,6 +6,14 @@ CA.Views.GpxesList = Backbone.View.extend({
 		
 	},
 	
+	initialize: function (){
+		var that = this;
+		that.collection.on('add reset', function(){
+			this.$el.empty();
+			this.render();
+		}, this);
+	},
+	
 	render: function(){
 		var that = this;
 		that.collection.each(function(gpx){

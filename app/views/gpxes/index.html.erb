@@ -23,11 +23,14 @@ $(function(){
 	};
 	
 	reader.onload = function (evt){
-		
-		var gpx = new CA.Models.Gpx({
-			data : evt.target.result
+		var gpx = new CA.Models.Gpx();			
+		gpx.save({ data: evt.target.result }, {
+			success: function (gpx, rsp){
+				console.log("success hit");
+				console.log(rsp);
+				CA.Store.Gpxes.add(new CA.Models.Gpx(rsp))
+			}
 		});
-		gpx.save();
 	};
 	
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
