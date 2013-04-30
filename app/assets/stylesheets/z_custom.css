@@ -3,3 +3,7 @@
 	display: inline-block;
 	float: left;
 }
+
+#files {
+    display:none;
+}

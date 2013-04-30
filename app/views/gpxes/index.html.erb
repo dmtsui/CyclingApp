@@ -1,20 +1,13 @@
-<h1 id="hedy">GPX Data</h1>
+<h1>GPX Data</h1>
 
-<div>
-	<h2>New GPX</h2>
-	<label for="gpx_data">
-		Data:
-		<input type="file" id="files" name="file"  />
-	</label>
-	<output id="list"></output>
-</div>
+<input type="file" id="files" name="file" />
 
 <div id="content" class="container">
 
 </div>
 <div id= "graph-details" class="container">
 	<div class="row">
-		<div class="span8 offset2">
+		<div class="span2 offset2">
 			<div id="map"></div>
 		</div>
 	</div>
@@ -27,26 +20,11 @@
 </div>
 
 <script>
-var reader = new FileReader();
 $(function(){
 	
-	function handleFileSelect(evt) {
-	    file = evt.target.files; // FileList object
-	  	reader.readAsText(file[0]);
-	};
+	CA.Helpers.GpxUploadView.initialize();
+
 	
-	reader.onload = function (evt){
-		var gpx = new CA.Models.Gpx();			
-		gpx.save({ data: evt.target.result }, {
-			success: function (gpx, rsp){
-				console.log("success hit");
-				console.log(rsp);
-				CA.Store.Gpxes.add(new CA.Models.Gpx(rsp))
-			}
-		});
-	};
-	
-	document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 	var gpxes = <%= @gpxes.to_json.html_safe %>;
 	
