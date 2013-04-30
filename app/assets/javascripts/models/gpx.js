@@ -20,6 +20,18 @@ CA.Models.Gpx = Backbone.RelationalModel.extend({
 			key: 'gpx'	
 		}		
 	},
+	
+	{
+		type: Backbone.HasOne,
+		key: 'trk',
+		relatedModel: 'CA.Models.Trk',
+		reverseRelation: {
+			key: 'gpx'	
+		}		
+	},
+	
+	
+	
 	{
 		type: Backbone.HasOne,
 		key: 'bound',
