@@ -12,8 +12,8 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	initialize: function(){
 		
 		this.r = 10;
-		this.WIDTH = 1600;
-		this.HEIGHT = 400,
+		this.WIDTH = 1200;
+		this.HEIGHT = 300,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
 		this.vis.append("svg:g").attr("class", "x-axis")
