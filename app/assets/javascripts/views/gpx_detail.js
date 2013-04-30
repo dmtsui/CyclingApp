@@ -10,11 +10,17 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	initialize: function(){
+		
 		this.r = 10;
 		this.WIDTH = 1600;
 		this.HEIGHT = 400,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
+		this.vis.append("svg:g").attr("class", "x-axis")
+		this.vis.append("svg:g").attr("class", "y-axis")
+		this.calcBounds();
+		this.setMap();
+		
 	},
 	
 	render: function(data, xfunc, yfunc, xbound, ybound){
@@ -50,45 +56,90 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	setTrkpts: function(){
 		var that = this;
 		that.data = that.model.get( 'trk' ).get( 'trkseg' ).get( 'trkpts' ).models;
-		that.setDistance();
 		return that.data;
 	},
-	
-	setElevation: function () {
-		var that = this;
-		var data = [];
-		_.each(that.data, function(d){
-			data.push(parseFloat(d.get('ele')));
-		});
-		data.sort(function(a, b) {
-		    return a - b;
-		});
-		return [data.shift(), data.pop()];
-	},
-	
-	setDistance: function () {
-		var that = this, last = null,
-			dList = [], current = null;
+		
+	calcBounds: function () {
+		var that = this, lastDist = null;
+		var data = that.model.get('trk').get('trkseg').get('trkpts').models;
+
+		var eleMax = parseFloat(data[0].get('ele'));
+		var eleMin = eleMax;
+		
+		var totalDist = 0;
+		
+		var maxSpeed = 0;
+		var allSpeeds = [];
+		var lastTime;
+		CA.Store.totalTime = 0;
 			
-		_.each(that.data, function(node){
-			current = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
-			if (last == null){
-				dList.push(0)
+		_.each(data, function(node){
+			var currentEle = parseFloat(node.get('ele'));
+			if (currentEle > eleMax){ eleMax = currentEle; }
+			if (currentEle < eleMin){ eleMin = currentEle; }
+			
+			var currentDist = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
+			
+			if (lastDist == null){
 				node.set('dist', 0);
+				allSpeeds.push(node.set('speed', 0));
+				lastTime = new Date(node.get('time'));
 			}else {
-				var dist = Math.sqrt(Math.pow((current[0]-last[0]), 2) + Math.pow((current[1]-last[1]), 2));
-				dist += dList[dList.length - 1];
-				dList.push(dist);
-				node.set('dist', dist);
+				var dist = Math.sqrt(Math.pow((currentDist[0]-lastDist[0]), 2) + Math.pow((currentDist[1]-lastDist[1]), 2));
+				dist *= 62.1371;
+				totalDist += dist;
+				node.set('dist', totalDist);
+				var currentTime = new Date(node.get('time'));
+				var speed = that.calcSpeed(currentTime, lastTime, dist);
+				if (speed > maxSpeed){ maxSpeed = speed; }
+				node.set('speed', speed);
+				allSpeeds.push(speed);
+				lastTime = currentTime;
 			}
-			last = current;
-			dList.sort(function(a, b) {
-			    return a - b;
-			});
+			lastDist = currentDist;
+			
 			
 		});
-		return [dList.shift(), dList.pop()];
+		allSpeeds.sort();
+		console.log(allSpeeds);
+		console.log(maxSpeed);
+		console.log(totalDist);
+		console.log(CA.Store.totalTime);
+		that.SpeedBounds = [0,maxSpeed];
+		that.EleBounds = [eleMin, eleMax];
+		that.DistBounds = [0, totalDist];
+		
+		return true;
 	},
+	
+	setMap: function(){
+		var that = this;
+		var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
+		var parent = 'map';
+		
+		var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
+		
+		var template = new MM.Template('http://tile.openstreetmap.org/{Z}/{X}/{Y}.png');
+		var layer = new MM.Layer(template);
+		
+		var map = new MM.Map(parent, layer);
+		var dimensions = new MM.Point(600, 400);
+		var map = new MM.Map(parent, layer, dimensions);
+		
+		console.log(point);
+		
+		map.setZoom(14).setCenter({ lat: point[0], lon: point[1] });
+	},
+	
+	mapCenter: function(){
+		
+	},
+	
+	calcSpeed: function (currentTime, lastTime, dist) {
+		var time = parseInt(currentTime - lastTime)/(3600000);
+		CA.Store.totalTime += time;
+		return ( dist/time );
+	},	
 	
 	setXMap: function(){
 		var that = this;
@@ -125,10 +176,10 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	drawAxis: function (){
 		var that = this;
 		
-		that.vis.append("svg:g").attr("class", "x-axis")
+		that.vis.select(".x-axis")
 			.attr("transform", "translate(0,"+ (that.HEIGHT - that.MARGINS.bottom) +")").call(that.xAxis);
 			
-		that.vis.append("svg:g").attr("class", "y-axis")
+		that.vis.select(".y-axis")
 			.attr("transform", "translate("+ (that.MARGINS.left) +", 0)").call(that.yAxis);
 		return that;		
 	},
@@ -148,7 +199,9 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		//     .y(function(d) { return that.HEIGHT - that.yRange ( yfunc(d) ); })
 		//     .interpolate("basis");
 		// var paths = that.vis.selectAll('path').data(data).attr("d", line);
-				
+		that.vis.selectAll("circle").remove();
+		
+
 		var circles = that.vis.selectAll("circle")
 					  .data(data);
 			circles.transition().duration(1000)
@@ -157,21 +210,22 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				.attr("r", function (d) { return 7 });
 			circles.enter()
 				.insert("svg:circle")
-				.attr("cx", that.MARGINS.left)
 				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
 				.attr("r",0)
 				.transition().duration(1000)
+				.attr("cy", that.HEIGHT)
 				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
 				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
 				.attr("r", function (d) { return 7 });
 			circles.exit()
 				.transition().duration(1000)
-				.attr("cx", that.MARGINS.left)
-				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
+				.attr("cy",  0)
 				.attr("r",0)
 				.remove();
 		that.setAxis();
 	},
+	
+	
 	
 	setMapXRange: function(d){
 		return parseFloat(d.get('lat'));

@@ -4,4 +4,9 @@ CyclingApp::Application.routes.draw do
     resources :bounds, only:[:create,:destroy]
     resources :wpts, except: [:new, :edit]
   end
+  
+  devise_for :users
+  
+  
+  
 end

@@ -25,13 +25,13 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		});
 		
 		that.$rootEl.append(gpxGraph.$el);
-		CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),2.5);
+		CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),1);
 		
 		gpxGraph.render(CA.Store.Trkpts,
 							 gpxGraph.setDist, 
 							 gpxGraph.setEle,
-						 	 gpxGraph.setDistance(),
-						     gpxGraph.setElevation());
+						 	 gpxGraph.DistBounds,
+						     gpxGraph.EleBounds);
 		//that.gpxGraph.circles.data(that.gpxGraph.data);
 		//$(".gpx-graph").html($('.gpx-graph').html());;
 		// setTimeout(function(){

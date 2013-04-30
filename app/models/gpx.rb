@@ -3,7 +3,9 @@ require 'json'
 class Gpx < ActiveRecord::Base
   attr_accessible :data
   
+
   before_save :make_json
+
   
   #validates :data, presence: true
   

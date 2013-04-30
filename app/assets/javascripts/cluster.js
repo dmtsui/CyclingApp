@@ -48,29 +48,29 @@ CA.Helpers.Cluster = {
 		return parseFloat(y/x);
 	},
 	
-	setDistance: function (data) {
-		//console.log('setDistance');
-		var that = this, last = null,
-			dList = [], current = null;
-			
-		_.each(data, function(node){
-			current = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
-			if (last == null){
-				dList.push(0)
-				node.set('dist', 0);
-			}else {
-				var dist = Math.sqrt(Math.pow((current[0]-last[0]), 2) + Math.pow((current[1]-last[1]), 2));
-				dist += dList[dList.length - 1];
-				dList.push(dist);
-				node.set('dist', dist);
-			}
-			last = current;
-			dList.sort(function(a, b) {
-			    return a - b;
-			});
-			
-		});
-		return [dList.shift(), dList.pop()];
-	}
+	// setDistance: function (data) {
+	// 	//console.log('setDistance');
+	// 	var that = this, last = null,
+	// 		dList = [], current = null;
+	// 		
+	// 	_.each(data, function(node){
+	// 		current = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
+	// 		if (last == null){
+	// 			dList.push(0)
+	// 			node.set('dist', 0);
+	// 		}else {
+	// 			var dist = Math.sqrt(Math.pow((current[0]-last[0]), 2) + Math.pow((current[1]-last[1]), 2));
+	// 			dist += dList[dList.length - 1];
+	// 			dList.push(dist);
+	// 			node.set('dist', dist);
+	// 		}
+	// 		last = current;
+	// 		dList.sort(function(a, b) {
+	// 		    return a - b;
+	// 		});
+	// 		
+	// 	});
+	// 	return [dList.shift(), dList.pop()];
+	// }
 	
 }
