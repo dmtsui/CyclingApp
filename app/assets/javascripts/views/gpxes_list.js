@@ -1,6 +1,6 @@
 CA.Views.GpxesList = Backbone.View.extend({
 	tagName: "ul",
-	className: "gpxes-list",
+	className: "dropdown-menu",
 	
 	events: {
 		
@@ -16,11 +16,13 @@ CA.Views.GpxesList = Backbone.View.extend({
 	
 	render: function(){
 		var that = this;
+		$dropdown = $('.gpx-menu');
+		$dropdown.empty();
 		that.collection.each(function(gpx){
 			var gpxList = new CA.Views.GpxItem({
 				model: gpx
-			});
-			that.$el.append(gpxList.render().$el);
+			});	
+		$dropdown.append(gpxList.render().$el);
 		});
 		return that;
 	}

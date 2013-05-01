@@ -14,11 +14,13 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		var gpxesList = new CA.Views.GpxesList({
 			collection: CA.Store.Gpxes
 		});
-		that.$rootEl.html(gpxesList.render().$el);
+		gpxesList.render();
 	},
 	
 	graph: function(id) {
+		$('a[href=#tab2]').tab('show');
 		var that = this;
+		that.index();
 		
 		var gpxGraph = new CA.Views.GpxGraph({
 			model : CA.Store.Gpxes.get(id)

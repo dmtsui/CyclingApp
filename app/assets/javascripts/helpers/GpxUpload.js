@@ -2,11 +2,11 @@ CA.Helpers.GpxUploadView = {
 	
 	initialize: function () {
 		var that = this;
-		var reader = new FileReader();
+		CA.Store.Reader = new FileReader();
 		
 		$('#files').on('change', that.handleFileSelect);
 		
-		reader.onload = function (evt){
+		CA.Store.Reader.onload = function (evt){
 			var gpx = new CA.Models.Gpx();			
 			gpx.save({ data: evt.target.result }, {
 				success: function (gpx, rsp){
@@ -32,8 +32,9 @@ CA.Helpers.GpxUploadView = {
 	},
 	
 	handleFileSelect: function (evt) {
+		var that = this;
 	    var file = evt.target.files; // FileList object
-	  	reader.readAsText(file[0]);
+	  	CA.Store.Reader.readAsText(file[0]);
 	},	
 
 	

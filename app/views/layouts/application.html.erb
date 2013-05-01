@@ -12,20 +12,34 @@
 	        <div class="container">
 	          <%= link_to "CyclingApp", '#', id: "logo" %>
 	          <nav>
-	            <ul class="nav pull-right">
-	              <li><%= link_to "Home", '#' %></li>
-	              <li><%= link_to "Help",    '#' %></li>
-	              <li>
-					  <% if user_signed_in? %>
-		    		  	<%= link_to "Sign out", destroy_user_session_path, :method => :delete %>
-		 			  <% else %>
-					    <%= link_to "Sign up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
-					  <% end %>
+	            <ul class="nav pull-right">	    		  	
+	 			  <% if !user_signed_in? %>
+				   <li>
+				    <%= link_to "Sign Up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
 				  </li>
+				  <% end %>
+				  
 				  <% if user_signed_in? %>
-	              	<li>
-					  <div id="file" class="btn">GPX Upload</div>
-				  	</li>
+				  
+					  <li class="dropdown">
+					     <a class="dropdown-toggle username"
+					        data-toggle="dropdown"
+					        href="#">
+					          <%= current_user.email %>
+					         <b class="caret"></b>
+					       </a>
+					     <ul class="dropdown-menu">
+							<li> <%= link_to "Profile", "#" %> </li>
+							<li> <%= link_to "Account", "#" %> </li>
+							<li> <%= link_to "Preferences", "#" %> </li>
+							<li>
+								<%= link_to "Sign Out", destroy_user_session_path, :method => :delete %>
+							</li>
+					       
+					     </ul>
+					   </li>
+					  
+					  <div id='file' class="btn">New Ride!</div>
 				  <% end %>
 				  
 				  	
@@ -33,7 +47,7 @@
 	          </nav>
 	        </div>
 	      </div>
-	    </header>
+	</header>
 
 
 

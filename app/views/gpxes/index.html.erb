@@ -1,30 +1,52 @@
-<h1>GPX Data</h1>
+<div class="container">
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+    <ul class="nav nav-tabs index-tab">
+      <li class="active"><a href="#tab1" data-toggle="tab">Feed</a></li>
+      <li><a href="#tab2" data-toggle="tab">Stats</a></li>
+    	  <li class="dropdown pull-right">
+    	     <a class="dropdown-toggle"
+    	        data-toggle="dropdown"
+    	        href="#">
+    	          Your Rides
+    	         <b class="caret"></b>
+    	       </a>
+    	     <ul class="dropdown-menu gpx-menu">
+    	     </ul>
+    	   </li>
+    </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab1">
+    </div>
+    <div class="tab-pane" id="tab2">
+		<div id= "graph-details" class="container">
+			<div class="row">
+				<div class="span2">
+					<div id="map"></div>
+				</div>
+			</div>
+			<div class="row">
 
-<input type="file" id="files" name="file" />
-
+				<div class="span6">
+					<svg width=1200 height=300 class="outside-svg"></svg>
+				</div>
+			</div>	
+		</div>
+    </div>
+    <div class="tab-pane" id="tab3">
+      <p>Howdy, I'm in Section 3.</p>
+    </div>
+  </div>
+</div>
+</div>
 <div id="content" class="container">
 
 </div>
-<div id= "graph-details" class="container">
-	<div class="row">
-		<div class="span2 offset2">
-			<div id="map"></div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="span8 offset 2">
-			<svg width=1200 height=300 class="outside-svg"></svg>
-		</div>
-	</div>
-	
-</div>
 
+<input type="file" id="files" name="file" />
 <script>
 $(function(){
 	
 	CA.Helpers.GpxUploadView.initialize();
-
-	
 
 	var gpxes = <%= @gpxes.to_json.html_safe %>;
 	

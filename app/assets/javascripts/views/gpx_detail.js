@@ -119,11 +119,11 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
 		
-		var template = new MM.Template('http://tile.openstreetmap.org/{Z}/{X}/{Y}.png');
+		var template = new MM.Template('http://spaceclaw.stamen.com/toner/{Z}/{X}/{Y}.png');
 		var layer = new MM.Layer(template);
 		
 		var map = new MM.Map(parent, layer);
-		var dimensions = new MM.Point(600, 400);
+		var dimensions = new MM.Point(400, 250);
 		var map = new MM.Map(parent, layer, dimensions);
 		
 		console.log(point);
@@ -207,7 +207,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			circles.transition().duration(1000)
 				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
 				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 7 });
+				.attr("r", function (d) { return 2 });
 			circles.enter()
 				.insert("svg:circle")
 				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
@@ -216,7 +216,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				.attr("cy", that.HEIGHT)
 				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
 				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 7 });
+				.attr("r", function (d) { return 2 });
 			circles.exit()
 				.transition().duration(1000)
 				.attr("cy",  0)

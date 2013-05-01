@@ -13,3 +13,4 @@ CA.Views.GpxItem = Backbone.View.extend({
 	}
 	
 });
+
