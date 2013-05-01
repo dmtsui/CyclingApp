@@ -18,6 +18,7 @@
 //= require backbone-relational
 //= require d3
 //= require modestmaps
+//= require leaflet
 
 //= require cycle_app
 

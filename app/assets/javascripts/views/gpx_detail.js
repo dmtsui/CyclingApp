@@ -62,6 +62,8 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	calcBounds: function () {
 		var that = this, lastDist = null;
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models;
+		
+		that.latlngs = [];
 
 		var eleMax = parseFloat(data[0].get('ele'));
 		var eleMin = eleMax;
@@ -74,6 +76,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.totalTime = 0;
 			
 		_.each(data, function(node){
+			that.latlngs.push(new L.LatLng(parseFloat(node.get('lat')), parseFloat(node.get('lon'))))
 			var currentEle = parseFloat(node.get('ele'));
 			if (currentEle > eleMax){ eleMax = currentEle; }
 			if (currentEle < eleMin){ eleMin = currentEle; }
@@ -115,20 +118,32 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	setMap: function(){
 		var that = this;
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
-		var parent = 'map';
 		
 		var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
 		
-		var template = new MM.Template('http://spaceclaw.stamen.com/toner/{Z}/{X}/{Y}.png');
-		var layer = new MM.Layer(template);
-		
-		var map = new MM.Map(parent, layer);
-		var dimensions = new MM.Point(400, 250);
-		var map = new MM.Map(parent, layer, dimensions);
-		
-		console.log(point);
-		
-		map.setZoom(14).setCenter({ lat: point[0], lon: point[1] });
+		that.map = L.map('map').setView([ point[0], point[1]], 13);
+		L.tileLayer('http://spaceclaw.stamen.com/toner/{z}/{x}/{y}.png', {
+		    maxZoom: 18
+		}).addTo(that.map);
+		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(that.map);
+		that.marker = L.marker([ point[0], point[1]]).addTo(that.map);
+		//var marker = L.marker([ point[0], point[1]]).addTo(that.map);
+
+		// var that = this;
+		// var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
+		// var parent = 'map';
+		// 
+		// var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
+		// 
+		// var template = new MM.Template('http://spaceclaw.stamen.com/toner/{Z}/{X}/{Y}.png');
+		// var layer = new MM.Layer(template);
+		// 
+		// var dimensions = new MM.Point(400, 250);
+		// that.map = new MM.Map(parent, layer, dimensions);
+		// 
+		// console.log(point);
+		// 
+		// that.map.setZoom(14).setCenter({ lat: point[0], lon: point[1] });
 	},
 	
 	mapCenter: function(){
@@ -194,29 +209,36 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			that.vis.select('.y-axis').call(that.yAxis);
 		}
 		
+		
 		// var line = d3.svg.line()
 		//     .x(function(d) { return that.xRange ( xfunc(d) ); })
-		//     .y(function(d) { return that.HEIGHT - that.yRange ( yfunc(d) ); })
-		//     .interpolate("basis");
-		// var paths = that.vis.selectAll('path').data(data).attr("d", line);
+		//     .y(function(d) { return(that.HEIGHT - that.yRange ( yfunc(d) )); });
+		// 
+		// var path = that.vis.data(data);
+		// path.append("path").attr("d", function(d){ return line(d)});
+		// 
+		
 		that.vis.selectAll("circle").remove();
 		
-
+		
 		var circles = that.vis.selectAll("circle")
 					  .data(data);
 			circles.transition().duration(1000)
 				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
 				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 2 });
+				.attr("r", function (d) { return 3 });
 			circles.enter()
 				.insert("svg:circle")
 				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
-				.attr("r",0)
+				.attr("r",0).on("mouseover", function(d){ 
+												that.displayInfo(d); 
+												d3.select(this).attr('r', 8).attr('fill', 'red');
+											}).on("mouseout", function(d) { d3.select(this).attr('r', 3).attr('fill', 'black')})
 				.transition().duration(1000)
 				.attr("cy", that.HEIGHT)
 				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
 				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 2 });
+				.attr("r", function (d) { return 4 });
 			circles.exit()
 				.transition().duration(1000)
 				.attr("cy",  0)
@@ -225,6 +247,19 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.setAxis();
 	},
 	
+	displayInfo: function(d){
+		var that = this;
+		$('.speed').html( d.get('speed').toFixed(1) + " MPH");
+		$('.elevation').html( parseFloat(d.get('ele')).toFixed(1) + " FT");
+		$('.dist').html( d.get('dist').toFixed(1) + " MILES");
+		var latLng =  new L.LatLng(parseFloat(d.get('lat')), parseFloat(d.get('lon')));
+		that.map.panTo( latLng );
+		that.marker.setLatLng( latLng );
+		that.marker.update()
+		// that.map.setZoom(14).setCenter({ lat: parseFloat(d.get('lat')),
+		// 	 						lon: parseFloat(d.get('lon')) });
+		// 
+	},
 	
 	
 	setMapXRange: function(d){

@@ -1,8 +1,8 @@
-
-#map {
-	display: inline-block;
-	float: left;
+#map { 
+	height: 215px;
+	width: 500px;
 }
+
 
 #files {
     display:none;
@@ -16,31 +16,15 @@
 	overflow-x: hidden;
 }
 
-.map {
-    float: left;
-    width: 512px;
-    height: 300px;
-    background-color: #ccc;
-    margin: 0;
+.top-detail {
+	  background-image: url("cycling-background.jpg"); 
+	  background-size: 100%;
+	  background-position: 0px -80px, top right;
 }
 
-.map .controls { visibility: hidden; }
-.map:hover .controls { visibility: visible; }
-
-.map .label {
-    font-family: "Courier New", monospace;
-    font-size: 13px;
-    line-height: 16px;
-
-    color: #fff;
-    background-color: #000;
-    background-color: rgba(0,0,0,.6);
-    border-radius: 5px;
-
-    padding: 4px 6px;
-
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    z-index: 100;
+.info {
+	color: white;
+	margin-left: 10px;
+	text-shadow: 0px 0px 3px black;
 }
+
