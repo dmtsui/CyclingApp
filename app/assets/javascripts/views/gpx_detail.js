@@ -65,6 +65,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		that.latlngs = [];
 
+
 		var eleMax = parseFloat(data[0].get('ele'));
 		var eleMin = eleMax;
 		
@@ -87,6 +88,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				node.set('dist', 0);
 				allSpeeds.push(node.set('speed', 0));
 				lastTime = new Date(node.get('time'));
+
 			}else {
 				var dist = Math.sqrt(Math.pow((currentDist[0]-lastDist[0]), 2) + Math.pow((currentDist[1]-lastDist[1]), 2));
 				dist *= 62.1371;
@@ -127,23 +129,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		}).addTo(that.map);
 		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(that.map);
 		that.marker = L.marker([ point[0], point[1]]).addTo(that.map);
-		//var marker = L.marker([ point[0], point[1]]).addTo(that.map);
 
-		// var that = this;
-		// var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
-		// var parent = 'map';
-		// 
-		// var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
-		// 
-		// var template = new MM.Template('http://spaceclaw.stamen.com/toner/{Z}/{X}/{Y}.png');
-		// var layer = new MM.Layer(template);
-		// 
-		// var dimensions = new MM.Point(400, 250);
-		// that.map = new MM.Map(parent, layer, dimensions);
-		// 
-		// console.log(point);
-		// 
-		// that.map.setZoom(14).setCenter({ lat: point[0], lon: point[1] });
 	},
 	
 	mapCenter: function(){
@@ -199,6 +185,11 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		return that;		
 	},
 	
+	calcPathPoint: function (command, datum, xfunc, yfunc) {
+		var that = this;
+		var pt = command + " " + that.xRange ( xfunc(datum) ) + " " + (that.HEIGHT - that.yRange ( yfunc(datum) )) + " ";
+		return pt;
+	},	
 	
 	plotData: function (data, xfunc, yfunc, xbound, ybound){
 		var that = this;
@@ -210,40 +201,42 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		}
 		
 		
-		// var line = d3.svg.line()
-		//     .x(function(d) { return that.xRange ( xfunc(d) ); })
-		//     .y(function(d) { return(that.HEIGHT - that.yRange ( yfunc(d) )); });
+		var d = "M "+ that.MARGINS.left + " " + (that.HEIGHT - that.MARGINS.bottom) + " ";
+		
+		_.each(data, function(datum){
+				d += that.calcPathPoint("L", datum, xfunc, yfunc);
+		});
+		d += "L "+ that.WIDTH + " " + (that.HEIGHT - that.MARGINS.bottom);
+		
+		that.vis.insert("svg:path").attr("d", d).attr('stroke-width', "2").attr("fill", d3.rgb(200,200,200));
+		
+		
+		// that.vis.selectAll("circle").remove();
 		// 
-		// var path = that.vis.data(data);
-		// path.append("path").attr("d", function(d){ return line(d)});
 		// 
-		
-		that.vis.selectAll("circle").remove();
-		
-		
-		var circles = that.vis.selectAll("circle")
-					  .data(data);
-			circles.transition().duration(1000)
-				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
-				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 3 });
-			circles.enter()
-				.insert("svg:circle")
-				.attr("cy", that.HEIGHT - that.MARGINS.bottom)
-				.attr("r",0).on("mouseover", function(d){ 
-												that.displayInfo(d); 
-												d3.select(this).attr('r', 8).attr('fill', 'red');
-											}).on("mouseout", function(d) { d3.select(this).attr('r', 3).attr('fill', 'black')})
-				.transition().duration(1000)
-				.attr("cy", that.HEIGHT)
-				.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
-				.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-				.attr("r", function (d) { return 4 });
-			circles.exit()
-				.transition().duration(1000)
-				.attr("cy",  0)
-				.attr("r",0)
-				.remove();
+		// var circles = that.vis.selectAll("circle")
+		// 			  .data(data);
+		// 	circles.transition().duration(1000)
+		// 		.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
+		// 		.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
+		// 		.attr("r", function (d) { return 3 });
+		// 	circles.enter()
+		// 		.insert("svg:circle")
+		// 		.attr("cy", that.HEIGHT - that.MARGINS.bottom)
+		// 		.attr("r",0).on("mouseover", function(d){ 
+		// 										that.displayInfo(d); 
+		// 										d3.select(this).attr('r', 8).attr('fill', 'red');
+		// 									}).on("mouseout", function(d) { d3.select(this).attr('r', 3).attr('fill', 'black')})
+		// 		.transition().duration(1000)
+		// 		.attr("cy", that.HEIGHT)
+		// 		.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
+		// 		.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
+		// 		.attr("r", function (d) { return 4 });
+		// 	circles.exit()
+		// 		.transition().duration(1000)
+		// 		.attr("cy",  0)
+		// 		.attr("r",0)
+		// 		.remove();
 		that.setAxis();
 	},
 	
@@ -255,7 +248,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var latLng =  new L.LatLng(parseFloat(d.get('lat')), parseFloat(d.get('lon')));
 		that.map.panTo( latLng );
 		that.marker.setLatLng( latLng );
-		that.marker.update()
+		that.marker.update();
 		// that.map.setZoom(14).setCenter({ lat: parseFloat(d.get('lat')),
 		// 	 						lon: parseFloat(d.get('lon')) });
 		// 
