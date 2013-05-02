@@ -10,23 +10,16 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	initialize: function(){
-		
+		var that = this;
 		this.r = 10;
 		this.WIDTH = 1200;
-		this.HEIGHT = 300,
+		this.HEIGHT = 200,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
-		this.vis.append("svg:g").attr("class", "x-axis")
-		this.vis.append("svg:g").attr("class", "y-axis")
-		this.circle = this.vis.append('circle').attr('r', 10);
-		this.calcBounds();
-		this.setMap();
+		
 		this.sv = new google.maps.StreetViewService();
-	},
-	
-	render: function(data, xfunc, yfunc, xbound, ybound){
-		var that = this;
-		that.vis.on('mousemove', function(d) { 
+		
+		this.vis.on('mousemove', function(d) { 
 									var datum = that.setInfo(d3.mouse(this));
 									that.displayInfo(datum); 
 								})
@@ -34,25 +27,30 @@ CA.Views.GpxGraph = Backbone.View.extend({
 					var datum = that.setInfo(d3.mouse(this));
 					var pos = new google.maps.LatLng( parseFloat(datum.get('lat')), parseFloat(datum.get('lon')) );
 					
-					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ that.panorama.setPano(data.location.pano);});
-					
+					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});	
 				});	
 
-		that.setBounds(xbound, ybound).setAxis().drawAxis();		
-		that.plotData(data, xfunc, yfunc);
+
+
+
+	},
+	
+	render: function(xfunc, yfunc){
+		var that = this;
+		that.vis.selectAll('circle').remove();
+		that.vis.selectAll('g').remove();
+		that.circle = this.vis.append('circle').attr('r', 10);
+		that.calcBounds();
+		var data_set = CA.Helpers.Cluster.cluster(that.setTrkpts(),1)
+		that.setMap();
+
+
+		that.setBounds().setAxis().drawAxis();		
+		that.plotData(data_set, xfunc, yfunc);
 		
 		var pos = new google.maps.LatLng( parseFloat(this.data[0].get('lat')), parseFloat(this.data[0].get('lon')) );
-	
-	    var panoramaOptions = {
-	      position: pos,
-	      pov: {
-	        heading: 34,
-	        pitch: 10
-	      }
-	    };
-	    that.panorama = new  google.maps.StreetViewPanorama(document.getElementById('pano'),panoramaOptions);
-
 		
+		that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 		
 		return that;
 	},
@@ -124,9 +122,12 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			
 		});
 		allSpeeds.sort();
+		
+		console.log('calcbounds!');
 		that.SpeedBounds = [0,maxSpeed];
 		that.EleBounds = [eleMin, eleMax];
 		that.DistBounds = [0, totalDist];
+		console.log(that.DistBounds);
 		
 		return true;
 	},
@@ -136,13 +137,15 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
 		
 		var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
-		
-		that.map = L.map('map').setView([ point[0], point[1]], 13);
+		var latLng =  new L.LatLng(point[0], point[1]);
+		//CA.Store.Map.panTo( latLng );
+		CA.Store.Map.setView([ point[0], point[1]], 13);
 		L.tileLayer('http://spaceclaw.stamen.com/toner/{z}/{x}/{y}.png', {
 		    maxZoom: 18
-		}).addTo(that.map);
-		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(that.map);
-		that.marker = L.marker([ point[0], point[1]]).addTo(that.map);
+		}).addTo(CA.Store.Map);
+		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(CA.Store.Map);
+		CA.Store.Marker.setLatLng( latLng );
+		CA.Store.Marker.update();
 
 	},
 	
@@ -168,11 +171,11 @@ CA.Views.GpxGraph = Backbone.View.extend({
 							
 		that.xRange = d3.scale.linear()
 					.range ([that.MARGINS.left, that.WIDTH - that.MARGINS.left])
-					.domain(xbound);
+					.domain(that.DistBounds);
 		
 		that.yRange = d3.scale.linear()
-					.range ([that.MARGINS.bottom, that.HEIGHT - that.MARGINS.bottom])
-					.domain(ybound);
+					.range ([that.HEIGHT - that.MARGINS.bottom, that.MARGINS.bottom])
+					.domain(that.EleBounds);
 				
 		return that;	
 	},
@@ -188,6 +191,9 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	drawAxis: function (){
 		var that = this;
 		
+		that.vis.append("svg:g").attr("class", "x-axis")
+		that.vis.append("svg:g").attr("class", "y-axis")
+		
 		that.vis.select(".x-axis")
 			.attr("transform", "translate(0,"+ (that.HEIGHT - that.MARGINS.bottom) +")").call(that.xAxis);
 			
@@ -196,19 +202,20 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		return that;		
 	},
 	
-	plotData: function (data, xfunc, yfunc, xbound, ybound){
+	plotData: function (data, xfunc, yfunc){
 		var that = this;
 		
-		if(xbound != undefined && ybound != undefined){
-			that.setBounds(xbound, ybound).setAxis();
-			that.vis.select('.x-axis').call(that.xAxis);
-			that.vis.select('.y-axis').call(that.yAxis);
-		}
+		// if(xbound != undefined && ybound != undefined){
+		// 	that.setBounds(xbound, ybound).setAxis();
+		// 	that.vis.select('.x-axis').call(that.xAxis);
+		// 	that.vis.select('.y-axis').call(that.yAxis);
+		// }
 		
+		that.vis.selectAll('path').remove();
 		
 		var line = d3.svg.line()
 		.x(function(d){ return that.xRange ( xfunc(d) )  })
-		.y(function(d){ return that.HEIGHT - that.yRange ( yfunc(d) )  });
+		.y(function(d){ return that.yRange ( yfunc(d) )  });
 		
 		that.vis.append("path").attr({
 									   "d": line(data),
@@ -216,28 +223,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 							      'stroke': "red",
 								    'fill': "none"
 								});
-		// that.vis.selectAll("circle").remove();
-		// 
-		// 
-		// var circle = that.vis.append('circle').data(that.currentDatum);
-		// 	circles.transition().duration(1000)
-		// 		.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
-		// 		.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-		// 		.attr("r", function (d) { return 10 });
-		// 	circles.enter()
-		// 		.insert("svg:circle")
-		// 		.attr("cy", that.HEIGHT - that.MARGINS.bottom)
-		// 		.attr("r",0)
-		// 		.transition().duration(1000)
-		// 		.attr("cy", that.HEIGHT)
-		// 		.attr("cx", function (d) { return that.xRange ( xfunc(d) ) })
-		// 		.attr("cy", function (d) { return that.HEIGHT - that.yRange ( yfunc(d) ) })
-		// 		.attr("r", function (d) { return 10 });
-		// 	circles.exit()
-		// 		.transition().duration(1000)
-		// 		.attr("cy",  0)
-		// 		.attr("r",0)
-		// 		.remove();
+
 		that.setAxis();
 	},
 	
@@ -252,15 +238,15 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var that = this;
 		that.circle
 			.attr("cx", that.xRange (d.get('dist') ) )
-			.attr("cy", that.HEIGHT - that.yRange ( d.get('ele')) );
+			.attr("cy", that.yRange ( d.get('ele')) );
 
 		$('.speed').html( d.get('speed').toFixed(1) + " MPH");
 		$('.elevation').html( parseFloat(d.get('ele')).toFixed(1) + " FT");
 		$('.dist').html( d.get('dist').toFixed(1) + " MILES");
 		var latLng =  new L.LatLng(parseFloat(d.get('lat')), parseFloat(d.get('lon')));
-		that.map.panTo( latLng );
-		that.marker.setLatLng( latLng );
-		that.marker.update();
+		CA.Store.Map.panTo( latLng );
+		CA.Store.Marker.setLatLng( latLng );
+		CA.Store.Marker.update();
 	},
 	
 	
@@ -273,12 +259,10 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	setEle: function (d){
-		//console.log(d.get('ele'));
 		return parseFloat(d.get('ele'));
 	},
 	
 	setDist: function(d){
-		//console.log(d.get('dist'));
 		return parseFloat(d.get('dist'));
 	}
 	

@@ -1,5 +1,5 @@
 CA.Models.Gpx = Backbone.RelationalModel.extend({
-	urlRoot: 'gpxes',
+	urlRoot: "gpxes/",
 	
 	relations:[{
 		type: Backbone.HasMany,

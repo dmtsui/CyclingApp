@@ -8,6 +8,7 @@ class GpxesController < ApplicationController
     @gpxes = Gpx.all
     @gpxes.map! do |gpx| 
       data = JSON.parse(gpx[:data])
+      data.delete('trk')
       data[:id] = gpx[:id]
       data
     end
@@ -22,7 +23,9 @@ class GpxesController < ApplicationController
     @gpx.data = params['data']
 
     if @gpx.save
-      render json: JSON.parse(@gpx[:data])
+      data = JSON.parse(@gpx[:data])
+      data[:id] = @gpx[:id]
+      render json: data
     else
       render json: @gpx.errors, status: 422
     end
@@ -30,7 +33,10 @@ class GpxesController < ApplicationController
   
   def show 
     @gpx = Gpx.find(params[:id])
-    render json: JSON.parse(@gpx[:data])
+    data = JSON.parse(@gpx[:data])
+    data[:id] = @gpx[:id]
+    #debugger
+    render json: data
   end
   
   def destroy

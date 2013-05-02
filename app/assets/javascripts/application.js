@@ -17,8 +17,8 @@
 //= require backbone
 //= require backbone-relational
 //= require d3
-//= require modestmaps
 //= require leaflet
+//= require html2canvas
 
 //= require cycle_app
 

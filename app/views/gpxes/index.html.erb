@@ -49,7 +49,7 @@
 			</div>
 			<div class="row">
 				<div class="span6">
-					<svg width=1200 height=300 class="outside-svg">
+					<svg width=1200 height=200 class="outside-svg">
 				  	
 					</svg>
 				</div>
@@ -70,6 +70,20 @@
 $(function(){
 	
 	CA.Helpers.GpxUploadView.initialize();
+	CA.Store.Map = L.map('map');
+	CA.Store.Marker = L.marker([0,0]).addTo(CA.Store.Map);
+	
+	var pos = new google.maps.LatLng( 0, 0);
+
+    var panoramaOptions = {
+      position: pos,
+      pov: {
+        heading: 34,
+        pitch: 10
+      }
+    };
+	
+    CA.Store.Panorama = new  google.maps.StreetViewPanorama(document.getElementById('pano'),panoramaOptions);
 
 	var gpxes = <%= @gpxes.to_json.html_safe %>;
 	

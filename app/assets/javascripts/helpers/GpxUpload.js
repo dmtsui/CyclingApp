@@ -9,10 +9,10 @@ CA.Helpers.GpxUploadView = {
 		CA.Store.Reader.onload = function (evt){
 			var gpx = new CA.Models.Gpx();			
 			gpx.save({ data: evt.target.result }, {
-				success: function (gpx, rsp){
+				success: function (gpx){
 					console.log("success hit");
-					console.log(rsp);
-					CA.Store.Gpxes.add(new CA.Models.Gpx(rsp))
+					//console.log(rsp);
+					CA.Store.Gpxes.add(gpx);
 				}
 			});
 		};

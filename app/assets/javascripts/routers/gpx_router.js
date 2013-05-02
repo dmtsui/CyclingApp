@@ -14,57 +14,42 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		var gpxesList = new CA.Views.GpxesList({
 			collection: CA.Store.Gpxes
 		});
-		gpxesList.render();
+		gpxesList.render();	
+		
 	},
 	
 	graph: function(id) {
 		$('a[href=#tab2]').tab('show');
+		
 		var that = this;
+		
 		that.index();
 		
+		var currentModel = CA.Store.Gpxes.get(id);
+		console.log("made it here");
+		
+		if (currentModel.get('trk') == null){
+			currentModel.fetch({
+				success: function(){
+					that.renderGraph(currentModel);
+				}
+			});
+		} else {
+			that.renderGraph(currentModel);
+		}
+		
+		
+	},
+	renderGraph: function(currentModel){
+		var that = this;
 		var gpxGraph = new CA.Views.GpxGraph({
-			model : CA.Store.Gpxes.get(id)
+			model : currentModel
 		});
 		
-		that.$rootEl.append(gpxGraph.$el);
-		CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),1);
+		that.$rootEl.html(gpxGraph.$el);
+		//CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),2);
 		
-		gpxGraph.render(CA.Store.Trkpts,
-							 gpxGraph.setDist, 
-							 gpxGraph.setEle,
-						 	 gpxGraph.DistBounds,
-						     gpxGraph.EleBounds);
-		//that.gpxGraph.circles.data(that.gpxGraph.data);
-		//$(".gpx-graph").html($('.gpx-graph').html());;
-		// setTimeout(function(){
-		// 	
-		// 	that.gpxGraph.plotData(that.gpxGraph.setRte(), 
-		// 					  	that.gpxGraph.setMapXRange, 
-		// 						that.gpxGraph.setMapYRange,
-		// 						that.gpxGraph.setXMap(),
-		// 						that.gpxGraph.setYMap());
-		// 	},2000);
-		// 	
-		// 	setTimeout(function(){
-		// 		that.gpxGraph.plotData(that.gpxGraph.setWpts(), 
-		// 						  	that.gpxGraph.setMapXRange, 
-		// 							that.gpxGraph.setMapYRange,
-		// 							that.gpxGraph.setXMap(),
-		// 							that.gpxGraph.setYMap());
-		// 		},4000);
-		// 	
-		// 	setTimeout(function(){
-		// 		that.gpxGraph.plotData(that.gpxGraph.setRte(), 
-		// 						  	that.gpxGraph.setDist, 
-		// 							that.gpxGraph.setEle,
-		// 							that.gpxGraph.setDistance(),
-		// 							that.gpxGraph.setElevation());
-		// 		},6000);
-	
-		
-		
-		
-		
+		gpxGraph.render(gpxGraph.setDist, gpxGraph.setEle);	
 	}
 	
 });
