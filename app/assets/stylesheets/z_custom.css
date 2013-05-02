@@ -17,14 +17,22 @@
 }
 
 .top-detail {
-	  background-image: url("cycling-background.jpg"); 
-	  background-size: 100%;
-	  background-position: 0px -80px, top right;
+
 }
 
 .info {
-	color: white;
+	color: Black
 	margin-left: 10px;
-	text-shadow: 0px 0px 3px black;
+}
+
+#pano {
+	position: absolute;
+	left: 800px;
+	top: 120px;
+	width: 507px;
+	height: 220px;
+	background-color: rgb(229,227,223);
+	overflow: hidden;
+	-webkit-transform: translateZ(0);
 }
 

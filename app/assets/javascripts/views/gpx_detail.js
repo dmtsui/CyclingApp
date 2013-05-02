@@ -21,6 +21,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		this.circle = this.vis.append('circle').attr('r', 10);
 		this.calcBounds();
 		this.setMap();
+		this.sv = new google.maps.StreetViewService();
 	},
 	
 	render: function(data, xfunc, yfunc, xbound, ybound){
@@ -28,10 +29,28 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.vis.on('mousemove', function(d) { 
 									var datum = that.setInfo(d3.mouse(this));
 									that.displayInfo(datum); 
-								});	
+								})
+				.on('click', function(d){
+					var datum = that.setInfo(d3.mouse(this));
+					var pos = new google.maps.LatLng( parseFloat(datum.get('lat')), parseFloat(datum.get('lon')) );
+					
+					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ that.panorama.setPano(data.location.pano);});
+					
+				});	
 
 		that.setBounds(xbound, ybound).setAxis().drawAxis();		
 		that.plotData(data, xfunc, yfunc);
+		
+		var pos = new google.maps.LatLng( parseFloat(this.data[0].get('lat')), parseFloat(this.data[0].get('lon')) );
+	
+	    var panoramaOptions = {
+	      position: pos,
+	      pov: {
+	        heading: 34,
+	        pitch: 10
+	      }
+	    };
+	    that.panorama = new  google.maps.StreetViewPanorama(document.getElementById('pano'),panoramaOptions);
 
 		
 		
@@ -224,7 +243,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	
 	setInfo: function (pos) {
 		var that = this;
-		var data_pos = Math.floor((pos[0]/ that.WIDTH) * that.data.length );
+		var data_pos = Math.floor((pos[0]/ (that.WIDTH - 30)) * that.data.length );
 		return that.data[data_pos];
 		
 	},
