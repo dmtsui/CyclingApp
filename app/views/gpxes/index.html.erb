@@ -71,6 +71,7 @@ $(function(){
 	
 	CA.Helpers.GpxUploadView.initialize();
 	CA.Store.Map = L.map('map');
+	L.Icon.Default.imagePath = "/assets";
 	CA.Store.Marker = L.marker([0,0]).addTo(CA.Store.Map);
 	
 	var pos = new google.maps.LatLng( 0, 0);

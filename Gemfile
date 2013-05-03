@@ -33,7 +33,7 @@ end
 
 gem 'jquery-rails'
 gem 'ejs'
-
+gem "leaflet-rails", "~> 0.5.0"
 
 
 # To use ActiveModel has_secure_password
