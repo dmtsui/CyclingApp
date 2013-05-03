@@ -19,6 +19,8 @@
 //= require d3
 //= require leaflet
 //= require html2canvas
+//= require rgbcolor
+//= require canvg
 
 //= require cycle_app
 

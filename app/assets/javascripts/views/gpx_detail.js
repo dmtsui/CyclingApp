@@ -27,7 +27,48 @@ CA.Views.GpxGraph = Backbone.View.extend({
 					var datum = that.setInfo(d3.mouse(this));
 					var pos = new google.maps.LatLng( parseFloat(datum.get('lat')), parseFloat(datum.get('lon')) );
 					
-					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});	
+					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
+					
+					var $tileContainer = $('div.leaflet-tile-pane');
+					var tiles = $('img.leaflet-tile')
+					_.each(tiles, function(tile){
+						// var $tile = $(tile);
+						// var style = $tile.attr('style');
+						// var klass = $tile.attr('klass');
+						// var src = $tile.attr('src');
+						// 
+						// var img = new Image();
+						// $img = $(img);
+						// $img.attr('style', style);
+						// $img.attr('class', klass);
+						// console.log(img);
+						// img.onload = function(){
+						// 	$tileContainer.append(img);
+						// }
+						tile.crossOrigin = "anonymous";
+						// img.src = src;
+						
+					});
+					
+					
+					html2canvas(document.getElementById('map'), {
+					  onrendered: function(canvas) {
+					    document.getElementById('canvas-div').appendChild(canvas);
+					  }
+					});
+					
+					// var ctx = canvas.getContext("2d");
+					// 
+					// var data = "data:image/svg+xml;base64;" + svg;
+					// 
+					// var img = new Image();
+					// 
+					// 
+					// 
+					// img.onload = function() { ctx.drawImage(img, 0, 0); }
+					// 
+					// img.src = data;
+						
 				});	
 
 
@@ -53,6 +94,42 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 		
 		return that;
+	},
+	
+	calcCenter: function(){
+		var that = this;
+		var length = that.data.length;
+		var segment = Math.floor(length/4);
+		var xs = 0;
+		var ys = 0;
+		for(var i = 0; i < 5; i++){
+			var datum = that.data[i*segment];
+			xs += parseFloat(datum.get('lat'));
+			ys += parseFloat(datum.get('lon'));
+		}
+		
+	
+		
+		var latLng =  new L.LatLng(xs/5, ys/5);
+		
+		return latLng;
+		
+	},
+	
+	captureMap: function(){
+		var serializer = new XMLSerializer();
+		var s = $('svg.leaflet-zoom-animated')[0];
+		
+		if (s.getAttribute('style') !== null){
+			s.removeAttribute('style');
+			s.removeAttribute('viewBox');
+		}
+		var svg = serializer.serializeToString(s);
+
+		var canvas = document.getElementById("tester");
+		
+		canvg('tester', svg, { scaleWidth: 400, scaleHeight: 400 } );
+		
 	},
 	
 	drawElev: function (){
@@ -136,16 +213,19 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var that = this;
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
 		
-		var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
-		var latLng =  new L.LatLng(point[0], point[1]);
+		//var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
+		var latLng =  that.calcCenter();
+		//new L.LatLng(point[0], point[1]);
 		//CA.Store.Map.panTo( latLng );
-		CA.Store.Map.setView([ point[0], point[1]], 13);
+		CA.Store.Map.setView( latLng, 11);
 		L.tileLayer('http://spaceclaw.stamen.com/toner/{z}/{x}/{y}.png', {
 		    maxZoom: 18
 		}).addTo(CA.Store.Map);
 		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(CA.Store.Map);
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
+		
+			that.captureMap();	
 
 	},
 	
