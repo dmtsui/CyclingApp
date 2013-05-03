@@ -11,8 +11,8 @@ CA.Helpers.GpxUploadView = {
 			gpx.save({ data: evt.target.result }, {
 				success: function (gpx){
 					console.log("success hit");
-					//console.log(rsp);
 					CA.Store.Gpxes.add(gpx);
+					$('#file').text("New Ride!");
 				}
 			});
 		};

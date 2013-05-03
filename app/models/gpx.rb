@@ -1,13 +1,12 @@
 require 'json'
 
 class Gpx < ActiveRecord::Base
-  attr_accessible :data
+  attr_accessible :data, :user_id
   
-
   before_save :make_json
 
+  belongs_to :user, inverse_of: :gpxes
   
-  #validates :data, presence: true
   
   def make_json
     raw_data = Hash.from_xml(self.data)

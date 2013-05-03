@@ -19,7 +19,7 @@ class GpxesController < ApplicationController
   end
   
   def create
-    @gpx = Gpx.new()
+    @gpx = current_user.gpxes.build()
     @gpx.data = params['data']
 
     if @gpx.save

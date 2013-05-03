@@ -14,11 +14,7 @@
 	          <%= link_to "CyclingApp", '#', id: "logo" %>
 	          <nav>
 	            <ul class="nav pull-right">	    		  	
-	 			  <% if !user_signed_in? %>
-				   <li>
-				    <%= link_to "Sign Up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
-				  </li>
-				  <% end %>
+
 				  
 				  <% if user_signed_in? %>
 				  
