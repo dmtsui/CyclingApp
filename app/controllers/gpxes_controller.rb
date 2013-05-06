@@ -5,7 +5,7 @@ class GpxesController < ApplicationController
   respond_to :html, only:[:index]
   
   def index
-    @gpxes = Gpx.all
+    @gpxes = current_user.gpxes.all
     @gpxes.map! do |gpx| 
       data = JSON.parse(gpx[:data])
       data.delete('trk')
@@ -40,7 +40,7 @@ class GpxesController < ApplicationController
   end
   
   def destroy
-    @gpx = Gpx.find(params[:id])
+    @gpx = current_user.gpxes.where(id: params[:id])
     if @gpx.destroy
       redirect_to gpxes_url
     else

@@ -29,33 +29,39 @@ CA.Views.GpxGraph = Backbone.View.extend({
 					
 					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 					
-					var $tileContainer = $('div.leaflet-tile-pane');
-					var tiles = $('img.leaflet-tile')
-					_.each(tiles, function(tile){
-						// var $tile = $(tile);
-						// var style = $tile.attr('style');
-						// var klass = $tile.attr('klass');
-						// var src = $tile.attr('src');
-						// 
-						// var img = new Image();
-						// $img = $(img);
-						// $img.attr('style', style);
-						// $img.attr('class', klass);
-						// console.log(img);
-						// img.onload = function(){
-						// 	$tileContainer.append(img);
-						// }
-						tile.crossOrigin = "anonymous";
-						// img.src = src;
-						
-					});
+					// var $tileContainer = $('div.leaflet-tile-pane');
+					// var tiles = $('img.leaflet-tile')
+					// var new_tiles = []
+					// _.each(tiles, function(tile){
+					// 	var $tile = $(tile);
+					// 	var style = $tile.attr('style');
+					// 	var klass = $tile.attr('klass');
+					// 	var src = $tile.attr('src');
+					// 	
+					// 	var img = new Image();
+					// 	$img = $(img);
+					// 	$img.attr('style', style);
+					// 	$img.attr('class', klass);
+					// 	console.log(img);
+					// 	img.onload = function(){
+					// 		new_tiles.push(img);
+					// 		tile.src = img.to
+					// 	}
+					// 	//tile.crossOrigin = "anonymous";
+					// 	img.src = src;
+					// });
+					// 
 					
 					
 					html2canvas(document.getElementById('map'), {
+						useCORS: true,
+						logging: false,
+						profile: false,
 					  onrendered: function(canvas) {
 					    document.getElementById('canvas-div').appendChild(canvas);
 					  }
 					});
+				
 					
 					// var ctx = canvas.getContext("2d");
 					// 
