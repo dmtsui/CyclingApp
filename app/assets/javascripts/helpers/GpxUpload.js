@@ -22,7 +22,7 @@ CA.Helpers.GpxUploadView = {
 	
 		fileInput.change(function(){
 		    $this = $(this);
-		    $('#file').text("File attached");
+		    $('#file').text("Process...");
 		})
 
 		$('#file').click(function(){

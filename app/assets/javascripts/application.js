@@ -21,6 +21,7 @@
 //= require html2canvas
 //= require rgbcolor
 //= require canvg
+//= require xml2json
 
 //= require cycle_app
 

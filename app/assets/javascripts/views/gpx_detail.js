@@ -53,15 +53,15 @@ CA.Views.GpxGraph = Backbone.View.extend({
 					// 
 					
 					
-					html2canvas(document.getElementById('map'), {
-						useCORS: true,
-						logging: false,
-						profile: false,
-					  onrendered: function(canvas) {
-					    document.getElementById('canvas-div').appendChild(canvas);
-					  }
-					});
-				
+					// html2canvas(document.getElementById('map'), {
+					// 	useCORS: true,
+					// 	logging: false,
+					// 	profile: false,
+					//   onrendered: function(canvas) {
+					//     document.getElementById('canvas-div').appendChild(canvas);
+					//   }
+					// });
+					// 				
 					
 					// var ctx = canvas.getContext("2d");
 					// 
@@ -75,6 +75,30 @@ CA.Views.GpxGraph = Backbone.View.extend({
 					// 
 					// img.src = data;
 						
+				// 	html2canvas(document.getElementById('map'), {
+				// 		useCORS: true,
+				// 		logging: false,
+				// 		profile: false,
+				// 	  onrendered: function(canvas) {
+				// 	    document.getElementById('canvas-div').appendChild(canvas);
+				// 		canvas.setAttribute('id', 'mini-map')
+				// 		var serializer = new XMLSerializer();
+				// 		var ctx = canvas.getContext('2d');
+				// 		var s = $('svg.leaflet-zoom-animated')[0];
+				// 		if (s.getAttribute('style') !== null){
+				// 			s.removeAttribute('style');
+				// 			s.removeAttribute('viewBox');
+				// 		}
+				// 		re = /^.*\((-?[0-9]+)px, (-?[0-9]+)px, 0\);/;
+				// 		pane = $('.leaflet-map-pane');
+				// 		trans_coord = pane.attr('style');
+				// 		m = trans_coord.match(re);
+				// 			
+				// 		var svg = serializer.serializeToString(s);
+				// 		ctx.drawSvg(svg,parseInt(m[1]),parseInt(m[2]));
+				// 	  }
+				// 	});
+				that.captureMap();
 				});	
 
 
@@ -90,6 +114,9 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.calcBounds();
 		var data_set = CA.Helpers.Cluster.cluster(that.setTrkpts(),1)
 		that.setMap();
+		
+
+	
 
 
 		that.setBounds().setAxis().drawAxis();		
@@ -99,6 +126,9 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 		
+		
+		//window.setTimeout(that.captureMap, 2000);
+
 		return that;
 	},
 	
@@ -123,18 +153,33 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	captureMap: function(){
-		var serializer = new XMLSerializer();
-		var s = $('svg.leaflet-zoom-animated')[0];
-		
-		if (s.getAttribute('style') !== null){
-			s.removeAttribute('style');
-			s.removeAttribute('viewBox');
-		}
-		var svg = serializer.serializeToString(s);
+		html2canvas(document.getElementById('map'), {
+			useCORS: true,
+			logging: true,
+			profile: false,
+			timeout: 5000,
+			proxy: "http://maps.stamen.com/",
+		  onrendered: function(canvas) {
+		   $('#canvas-div').html(canvas);
+			canvas.setAttribute('id', 'mini-map')
+			var serializer = new XMLSerializer();
+			var ctx = canvas.getContext('2d');
+			var s = $('svg.leaflet-zoom-animated')[0];
+			if (s.getAttribute('style') !== null){
+				s.removeAttribute('style');
+				s.removeAttribute('viewBox');
+			}
+			re = /^.*\((-?[0-9]+)px, (-?[0-9]+)px, 0\);/;
+			pane = $('.leaflet-map-pane');
+			trans_coord = pane.attr('style');
+			m = trans_coord.match(re);
 
-		var canvas = document.getElementById("tester");
-		
-		canvg('tester', svg, { scaleWidth: 400, scaleHeight: 400 } );
+			var svg = serializer.serializeToString(s);
+			ctx.drawSvg(svg,parseInt(m[1]),parseInt(m[2]));
+
+		  }
+		});
+
 		
 	},
 	
@@ -231,7 +276,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
 		
-			that.captureMap();	
+			//that.captureMap();	
 
 	},
 	
