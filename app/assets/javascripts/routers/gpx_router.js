@@ -1,11 +1,18 @@
 CA.Routers.GpxRouter = Backbone.Router.extend({
 	routes: {
 			   "": "index",
-		"gpxes/:id": "graph"
+		"gpxes/:id": "graph",
+		"gpxes/new": "graph"
 	},
 	
 	initialize: function($rootEl){
 		this.$rootEl = $rootEl;
+		
+	},
+	
+	
+	feed: function(){
+		var that = this;
 		
 	},
 	
@@ -16,16 +23,22 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		});
 		gpxesList.render();	
 		
+		var gpxesFeedList = new CA.Views.GpxesFeedList({
+			collection: CA.Store.Gpxes
+		});
+		gpxesFeedList.render();	
+		
+		
 	},
 	
-	graph: function(id) {
+	graph: function(id, model) {
 		$('a[href=#tab2]').tab('show');
 		
 		var that = this;
 		
 		that.index();
 		
-		var currentModel = CA.Store.Gpxes.get(id);
+		var currentModel = CA.Store.Gpxes.get(id) || CA.Store.Gpx;
 		console.log("made it here");
 		
 		if (currentModel.get('trk') == null){

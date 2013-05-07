@@ -17,92 +17,20 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
 		
+		CA.Store.Marker.on('click', function(){
+			var datum = CA.Store.CurrentDatum;
+			var pos = new google.maps.LatLng( datum.get('lat'), datum.get('lon') );
+			
+			that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
+		});	
+		
 		this.sv = new google.maps.StreetViewService();
 		
 		this.vis.on('mousemove', function(d) { 
 									var datum = that.setInfo(d3.mouse(this));
 									that.displayInfo(datum); 
-								})
-				.on('click', function(d){
-					var datum = that.setInfo(d3.mouse(this));
-					var pos = new google.maps.LatLng( parseFloat(datum.get('lat')), parseFloat(datum.get('lon')) );
-					
-					that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
-					
-					// var $tileContainer = $('div.leaflet-tile-pane');
-					// var tiles = $('img.leaflet-tile')
-					// var new_tiles = []
-					// _.each(tiles, function(tile){
-					// 	var $tile = $(tile);
-					// 	var style = $tile.attr('style');
-					// 	var klass = $tile.attr('klass');
-					// 	var src = $tile.attr('src');
-					// 	
-					// 	var img = new Image();
-					// 	$img = $(img);
-					// 	$img.attr('style', style);
-					// 	$img.attr('class', klass);
-					// 	console.log(img);
-					// 	img.onload = function(){
-					// 		new_tiles.push(img);
-					// 		tile.src = img.to
-					// 	}
-					// 	//tile.crossOrigin = "anonymous";
-					// 	img.src = src;
-					// });
-					// 
-					
-					
-					// html2canvas(document.getElementById('map'), {
-					// 	useCORS: true,
-					// 	logging: false,
-					// 	profile: false,
-					//   onrendered: function(canvas) {
-					//     document.getElementById('canvas-div').appendChild(canvas);
-					//   }
-					// });
-					// 				
-					
-					// var ctx = canvas.getContext("2d");
-					// 
-					// var data = "data:image/svg+xml;base64;" + svg;
-					// 
-					// var img = new Image();
-					// 
-					// 
-					// 
-					// img.onload = function() { ctx.drawImage(img, 0, 0); }
-					// 
-					// img.src = data;
-						
-				// 	html2canvas(document.getElementById('map'), {
-				// 		useCORS: true,
-				// 		logging: false,
-				// 		profile: false,
-				// 	  onrendered: function(canvas) {
-				// 	    document.getElementById('canvas-div').appendChild(canvas);
-				// 		canvas.setAttribute('id', 'mini-map')
-				// 		var serializer = new XMLSerializer();
-				// 		var ctx = canvas.getContext('2d');
-				// 		var s = $('svg.leaflet-zoom-animated')[0];
-				// 		if (s.getAttribute('style') !== null){
-				// 			s.removeAttribute('style');
-				// 			s.removeAttribute('viewBox');
-				// 		}
-				// 		re = /^.*\((-?[0-9]+)px, (-?[0-9]+)px, 0\);/;
-				// 		pane = $('.leaflet-map-pane');
-				// 		trans_coord = pane.attr('style');
-				// 		m = trans_coord.match(re);
-				// 			
-				// 		var svg = serializer.serializeToString(s);
-				// 		ctx.drawSvg(svg,parseInt(m[1]),parseInt(m[2]));
-				// 	  }
-				// 	});
-				that.captureMap();
-				});	
-
-
-
+									CA.Store.CurrentDatum = datum;
+								});
 
 	},
 	
@@ -113,11 +41,9 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.circle = this.vis.append('circle').attr('r', 10);
 		that.calcBounds();
 		var data_set = CA.Helpers.Cluster.cluster(that.setTrkpts(),1)
-		that.setMap();
 		
-
-	
-
+		
+		that.setMap();
 
 		that.setBounds().setAxis().drawAxis();		
 		that.plotData(data_set, xfunc, yfunc);
@@ -126,8 +52,14 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 		
-		
-		//window.setTimeout(that.captureMap, 2000);
+		if (that.model.get('image') == null){
+			
+			window.setTimeout(function(){
+				that.captureMap();
+					
+			}, 500);	
+		}
+
 
 		return that;
 	},
@@ -153,11 +85,12 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	captureMap: function(){
+		var that = this;
 		html2canvas(document.getElementById('map'), {
 			useCORS: true,
 			logging: true,
 			profile: false,
-			timeout: 5000,
+			timeout: 1000,
 			proxy: "http://maps.stamen.com/",
 		  onrendered: function(canvas) {
 		   $('#canvas-div').html(canvas);
@@ -169,35 +102,24 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				s.removeAttribute('style');
 				s.removeAttribute('viewBox');
 			}
-			re = /^.*\((-?[0-9]+)px, (-?[0-9]+)px, 0\);/;
-			pane = $('.leaflet-map-pane');
-			trans_coord = pane.attr('style');
-			m = trans_coord.match(re);
+			var re = /^.*\((-?[0-9]+)px, (-?[0-9]+)px, 0\);/;
+			var pane = $('.leaflet-map-pane');
+			var trans_coord = pane.attr('style');
+			var m = trans_coord.match(re);
 
 			var svg = serializer.serializeToString(s);
 			ctx.drawSvg(svg,parseInt(m[1]),parseInt(m[2]));
 
+			that.model.save({'image': $('#mini-map')[0].toDataURL()}, {patch: true});
+
 		  }
 		});
+		
+		return true;
 
 		
 	},
 	
-	drawElev: function (){
-		console.log("button works")
-	},
-	
-	setRte: function(){
-		var that = this;
-		that.data = that.model.get( 'rtes' ).first().get('rtepts').models;
-		return that.data;
-	},
-	
-	setWpts: function(){
-		var that = this;
-		that.data = that.model.get( 'wpts' ).models;
-		return that.data;
-	},
 	setTrkpts: function(){
 		var that = this;
 		that.data = that.model.get( 'trk' ).get( 'trkseg' ).get( 'trkpts' ).models;
@@ -207,55 +129,15 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	calcBounds: function () {
 		var that = this, lastDist = null;
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models;
-		
+				
 		that.latlngs = [];
-
-		var eleMax = parseFloat(data[0].get('ele'));
-		var eleMin = eleMax;
-		
-		var totalDist = 0;
 		
 		var maxSpeed = 0;
-		var allSpeeds = [];
-		var lastTime;
-		CA.Store.totalTime = 0;
-			
-		_.each(data, function(node){
-			that.latlngs.push(new L.LatLng(parseFloat(node.get('lat')), parseFloat(node.get('lon'))))
-			var currentEle = parseFloat(node.get('ele'));
-			if (currentEle > eleMax){ eleMax = currentEle; }
-			if (currentEle < eleMin){ eleMin = currentEle; }
-			
-			var currentDist = [parseFloat(node.get('lat')), parseFloat(node.get('lon'))];
-			
-			if (lastDist == null){
-				node.set('dist', 0);
-				allSpeeds.push(node.set('speed', 0));
-				lastTime = new Date(node.get('time'));
 
-			}else {
-				var dist = Math.sqrt(Math.pow((currentDist[0]-lastDist[0]), 2) + Math.pow((currentDist[1]-lastDist[1]), 2));
-				dist *= 62.1371;
-				totalDist += dist;
-				node.set('dist', totalDist);
-				var currentTime = new Date(node.get('time'));
-				var speed = that.calcSpeed(currentTime, lastTime, dist);
-				if (speed > maxSpeed){ maxSpeed = speed; }
-				node.set('speed', speed);
-				allSpeeds.push(speed);
-				lastTime = currentTime;
-			}
-			lastDist = currentDist;
-			
+		_.each(data, function(node){
+			that.latlngs.push(new L.LatLng(parseFloat(node.get('lat')), parseFloat(node.get('lon'))))		
 			
 		});
-		allSpeeds.sort();
-		
-		console.log('calcbounds!');
-		that.SpeedBounds = [0,maxSpeed];
-		that.EleBounds = [eleMin, eleMax];
-		that.DistBounds = [0, totalDist];
-		console.log(that.DistBounds);
 		
 		return true;
 	},
@@ -264,15 +146,20 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var that = this;
 		var data = that.model.get('trk').get('trkseg').get('trkpts').models[0];
 		
-		//var point = [parseFloat(data.get('lat')), parseFloat(data.get('lon'))];
 		var latLng =  that.calcCenter();
-		//new L.LatLng(point[0], point[1]);
-		//CA.Store.Map.panTo( latLng );
+
 		CA.Store.Map.setView( latLng, 11);
 		L.tileLayer('http://spaceclaw.stamen.com/toner/{z}/{x}/{y}.png', {
-		    maxZoom: 18
+		    maxZoom: 11,
+			minZoom: 11
 		}).addTo(CA.Store.Map);
-		that.polyline = L.polyline(that.latlngs, {color: 'red'}).addTo(CA.Store.Map);
+		
+		if (CA.Store.Polyline !== undefined){
+			CA.Store.Map.removeLayer(CA.Store.Polyline);			
+		}
+
+		CA.Store.Polyline = L.polyline(that.latlngs, {color: 'red'});
+		CA.Store.Polyline.addTo(CA.Store.Map);
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
 		
@@ -302,11 +189,11 @@ CA.Views.GpxGraph = Backbone.View.extend({
 							
 		that.xRange = d3.scale.linear()
 					.range ([that.MARGINS.left, that.WIDTH - that.MARGINS.left])
-					.domain(that.DistBounds);
+					.domain(that.model.get('DistBounds'));
 		
 		that.yRange = d3.scale.linear()
 					.range ([that.HEIGHT - that.MARGINS.bottom, that.MARGINS.bottom])
-					.domain(that.EleBounds);
+					.domain(that.model.get('EleBounds'));
 				
 		return that;	
 	},
@@ -335,12 +222,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	
 	plotData: function (data, xfunc, yfunc){
 		var that = this;
-		
-		// if(xbound != undefined && ybound != undefined){
-		// 	that.setBounds(xbound, ybound).setAxis();
-		// 	that.vis.select('.x-axis').call(that.xAxis);
-		// 	that.vis.select('.y-axis').call(that.yAxis);
-		// }
 		
 		that.vis.selectAll('path').remove();
 		
@@ -395,10 +276,5 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	
 	setDist: function(d){
 		return parseFloat(d.get('dist'));
-	}
-	
-	
-	
-	
-	
+	}	
 });
