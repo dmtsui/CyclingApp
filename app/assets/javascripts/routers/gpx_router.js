@@ -26,7 +26,7 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		var gpxesFeedList = new CA.Views.GpxesFeedList({
 			collection: CA.Store.Gpxes
 		});
-		gpxesFeedList.render();	
+		$('#feed-container').html(gpxesFeedList.render().$el);	
 		
 		
 	},
@@ -55,14 +55,26 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 	},
 	renderGraph: function(currentModel){
 		var that = this;
-		var gpxGraph = new CA.Views.GpxGraph({
+		
+		if (that.gpxGraph !== undefined){
+			CA.Store.Marker.off('click');
+			// CA.Store.Marker.unbindPopup()
+			that.gpxGraph.vis.on('mousemove', null);
+			that.gpxGraph.vis.on('mouseout', null);
+			
+			//$('.outside-svg').off('mouseout');
+			//d3.select('.outside-svg').off('mouseout');
+			that.gpxGraph.remove();
+		}
+		
+		that.gpxGraph = new CA.Views.GpxGraph({
 			model : currentModel
 		});
 		
-		that.$rootEl.html(gpxGraph.$el);
+		that.$rootEl.html(that.gpxGraph.$el);
 		//CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),2);
 		
-		gpxGraph.render(gpxGraph.setDist, gpxGraph.setEle);	
+		that.gpxGraph.render(that.gpxGraph.setDist, that.gpxGraph.setEle);	
 	}
 	
 });

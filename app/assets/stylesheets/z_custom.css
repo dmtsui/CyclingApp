@@ -26,13 +26,24 @@
 }
 
 #pano {
-	position: absolute;
-	left: 800px;
-	top: 120px;
-	width: 400px;
-	height: 300px;
+	position: inline-block;
+	max-width: none;
+	width: auto; 
+	height: 400px;
 	background-color: rgb(229,227,223);
-	overflow: hidden;
-	-webkit-transform: translateZ(0);
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 
+.no-display {
+	display: none;
+}
+
+#panoModal {
+}
+
+.modal-body {
+	height: 500px;
+}

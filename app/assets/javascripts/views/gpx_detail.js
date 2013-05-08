@@ -6,7 +6,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 	},
 	
 	events: {
-		"click button.drawElev": "drawElev"
 	},
 	
 	initialize: function(){
@@ -17,20 +16,28 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg');
 		
+		$panoBtn = $('#pano-modal-btn');
+
+		
 		CA.Store.Marker.on('click', function(){
 			var datum = CA.Store.CurrentDatum;
 			var pos = new google.maps.LatLng( datum.get('lat'), datum.get('lon') );
 			
 			that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
+
+			$panoBtn.click();
+			
 		});	
 		
 		this.sv = new google.maps.StreetViewService();
 		
 		this.vis.on('mousemove', function(d) { 
+									CA.Store.Marker.closePopup();
 									var datum = that.setInfo(d3.mouse(this));
 									that.displayInfo(datum); 
 									CA.Store.CurrentDatum = datum;
-								});
+								})
+				.on('mouseout', function(){ CA.Store.Marker.openPopup(); });
 
 	},
 	
@@ -41,7 +48,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.circle = this.vis.append('circle').attr('r', 10);
 		that.calcBounds();
 		var data_set = CA.Helpers.Cluster.cluster(that.setTrkpts(),1)
-		
 		
 		that.setMap();
 
@@ -60,7 +66,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			}, 500);	
 		}
 
-
 		return that;
 	},
 	
@@ -75,8 +80,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			xs += parseFloat(datum.get('lat'));
 			ys += parseFloat(datum.get('lon'));
 		}
-		
-	
 		
 		var latLng =  new L.LatLng(xs/5, ys/5);
 		
@@ -116,8 +119,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		});
 		
 		return true;
-
-		
 	},
 	
 	setTrkpts: function(){
@@ -135,8 +136,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var maxSpeed = 0;
 
 		_.each(data, function(node){
-			that.latlngs.push(new L.LatLng(parseFloat(node.get('lat')), parseFloat(node.get('lon'))))		
-			
+			that.latlngs.push(new L.LatLng(parseFloat(node.get('lat')), parseFloat(node.get('lon'))))				
 		});
 		
 		return true;
@@ -162,8 +162,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.Polyline.addTo(CA.Store.Map);
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
-		
-			//that.captureMap();	
 
 	},
 	
@@ -228,22 +226,20 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		var line = d3.svg.line()
 		.x(function(d){ return that.xRange ( xfunc(d) )  })
 		.y(function(d){ return that.yRange ( yfunc(d) )  });
-		
 		that.vis.append("path").attr({
 									   "d": line(data),
 							'stroke-width': "2",
 							      'stroke': "red",
 								    'fill': "none"
 								});
-
 		that.setAxis();
 	},
 	
 	setInfo: function (pos) {
 		var that = this;
 		var data_pos = Math.floor((pos[0]/ (that.WIDTH - 30)) * that.data.length );
-		return that.data[data_pos];
 		
+		return that.data[data_pos];
 	},
 	
 	displayInfo: function(d){
@@ -255,7 +251,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		$('.speed').html( d.get('speed').toFixed(1) + " MPH");
 		$('.elevation').html( parseFloat(d.get('ele')).toFixed(1) + " FT");
 		$('.dist').html( d.get('dist').toFixed(1) + " MILES");
-		var latLng =  new L.LatLng(parseFloat(d.get('lat')), parseFloat(d.get('lon')));
+		var latLng =  new L.LatLng(d.get('lat'), d.get('lon'));
 		CA.Store.Map.panTo( latLng );
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();

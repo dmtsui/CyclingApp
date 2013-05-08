@@ -18,11 +18,6 @@ CA.Helpers.GpxUploadView = {
 					CA.Store.Router.navigate("#/gpxes/"+gpx.get('id'));
 				}
 			});
-			// window.setTimeout(function(){
-			// 	gpx.save({'image': gpx.get('image')}, {patch: true});
-			// }, 6000);
-			
-			
 
 		};
 		

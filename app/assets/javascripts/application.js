@@ -22,6 +22,7 @@
 //= require rgbcolor
 //= require canvg
 //= require xml2json
+//= require colorbox
 
 //= require cycle_app
 

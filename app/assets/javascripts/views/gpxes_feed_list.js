@@ -1,6 +1,6 @@
 CA.Views.GpxesFeedList = Backbone.View.extend({
 	tagName: "ul",
-	className: "gpxes-feed-list",
+	className: "thumbnails",
 	
 	events: {
 		
@@ -22,7 +22,7 @@ CA.Views.GpxesFeedList = Backbone.View.extend({
 			var gpxFeedList = new CA.Views.GpxFeedItem({
 				model: gpx
 			});	
-			$feedContainer.append(gpxFeedList.render().$el);
+			that.$el.append(gpxFeedList.render().$el);
 		});
 		return that;
 	}
