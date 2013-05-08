@@ -24,28 +24,10 @@
     <div class="tab-pane" id="tab2">
 		<div id= "graph-details" class="container">
 			<div class="row">
-				<div class="span6">
+				<div class="span12">
 					<div id="map"><!-- Leaflet generated map here --></div>
 				</div>
-				<div class="span3 top-detail">
-					<div class="row">
-						<div class="span1 offset">
-							<h3 class="info">Speed: <div class="speed">0.0 MPH</div> </h3>
-						</div>
-					</div>
-					<div class="row">
-						<div class="span1 offset">
-							<h3 class="info">Elevation: <div class="elevation">0.0 FT</div> </h3>
-						</div>
-					</div>
-					<div class="row">
-						<div class="span1 offset">
-							<h3 class="info">Distance: <div class="dist">0.0 MILES</div> </h3>
-						</div>
-					</div>
-				</div>
-					<div class="span4 offset5">
-				</div>
+
 			</div>
 			<div class="row">
 				<div class="span12">
@@ -91,7 +73,25 @@ $(function(){
 	CA.Store.Map = L.map('map');
 	L.Icon.Default.imagePath = "/assets";
 	CA.Store.Marker = L.marker([0,0]).addTo(CA.Store.Map);
-	CA.Store.Marker.bindPopup("Street View!");
+	
+	
+	// <div class="span3 top-detail">
+	// 	<div class="row">
+	// 		<div class="span1 offset">
+	// 			
+	// 		</div>
+	// 	</div>
+	// 	<div class="row">
+	// 		<div class="span1 offset">
+	// 			<h3 class="info">Elevation: <div class="elevation">0.0 FT</div> </h3>
+	// 		</div>
+	// 	</div>
+	// 	<div class="row">
+	// 		<div class="span1 offset">
+	// 			<h3 class="info">Distance: <div class="dist">0.0 MILES</div> </h3>
+	// 		</div>
+	// 	</div>
+	// </div>
 	
 	var pos = new google.maps.LatLng( 0, 0);
 

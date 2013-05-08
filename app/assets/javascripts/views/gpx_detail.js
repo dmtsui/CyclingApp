@@ -26,18 +26,19 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			that.sv.getPanoramaByLocation( pos, 50, function(data, status){ CA.Store.Panorama.setPano(data.location.pano);});
 
 			$panoBtn.click();
-			
-		});	
+		
+		});
+
 		
 		this.sv = new google.maps.StreetViewService();
 		
 		this.vis.on('mousemove', function(d) { 
-									CA.Store.Marker.closePopup();
+									//CA.Store.Marker.openPopup();
 									var datum = that.setInfo(d3.mouse(this));
 									that.displayInfo(datum); 
 									CA.Store.CurrentDatum = datum;
-								})
-				.on('mouseout', function(){ CA.Store.Marker.openPopup(); });
+								});
+				//.on('mouseout', function(){ CA.Store.Marker.openPopup(); });
 
 	},
 	
@@ -67,10 +68,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		}
 
 		return that;
-	},
-	
-	resizeChart: function(){
-		
 	},
 	
 	calcCenter: function(){
@@ -166,6 +163,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.Polyline.addTo(CA.Store.Map);
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
+		CA.Store.Marker.bindPopup("StartScrubbing").openPopup();	
 
 	},
 	
@@ -253,12 +251,18 @@ CA.Views.GpxGraph = Backbone.View.extend({
 			.attr("cy", that.yRange ( d.get('ele')) );
 
 		$('.speed').html( d.get('speed').toFixed(1) + " MPH");
-		$('.elevation').html( parseFloat(d.get('ele')).toFixed(1) + " FT");
+		$('.elevation').html( d.get('ele').toFixed(1) + " FT");
 		$('.dist').html( d.get('dist').toFixed(1) + " MILES");
 		var latLng =  new L.LatLng(d.get('lat'), d.get('lon'));
 		CA.Store.Map.panTo( latLng );
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
+		CA.Store.Marker.unbindPopup()
+						.bindPopup("<div><strong>Speed: </strong>" + d.get('speed').toFixed(1) + " MPH</div>"+
+									"<div><strong>Elevation: </strong>" + d.get('ele').toFixed(1) + " FT</div>"+
+									"<div><strong>Distance: </strong>" + d.get('dist').toFixed(1) + " MILES</div>"
+								).openPopup();
+		
 	},
 	
 	
