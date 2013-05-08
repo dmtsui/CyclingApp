@@ -14,10 +14,10 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		this.WIDTH = 1200;
 		this.HEIGHT = 200,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
-		this.vis = d3.select('.outside-svg');
+		this.vis = d3.select('.outside-svg') .attr("viewBox", "0 0 1200 200");
+
 		
 		$panoBtn = $('#pano-modal-btn');
-
 		
 		CA.Store.Marker.on('click', function(){
 			var datum = CA.Store.CurrentDatum;
@@ -67,6 +67,10 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		}
 
 		return that;
+	},
+	
+	resizeChart: function(){
+		
 	},
 	
 	calcCenter: function(){

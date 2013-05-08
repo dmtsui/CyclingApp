@@ -1,6 +1,7 @@
 #map { 
 	height: 300px;
-	width: 500px;
+	max-width: 500px;
+	width: auto;
 }
 
 

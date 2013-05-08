@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130506155933) do
+ActiveRecord::Schema.define(:version => 20130508170755) do
 
   create_table "bounds", :force => true do |t|
     t.float    "minlat"
@@ -52,6 +52,16 @@ ActiveRecord::Schema.define(:version => 20130506155933) do
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
+
+  create_table "users_users", :force => true do |t|
+    t.integer  "this_user_id"
+    t.integer  "other_user_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "users_users", ["other_user_id"], :name => "index_users_users_on_other_user_id"
+  add_index "users_users", ["this_user_id"], :name => "index_users_users_on_this_user_id"
 
   create_table "wpts", :force => true do |t|
     t.float    "lat"

@@ -11,6 +11,8 @@ class User < ActiveRecord::Base
   
   has_many :gpxes, inverse_of: :user
   
+  has_and_belongs_to_many :followers, class_name: "User", foreign_key: "this_user_id", association_foreign_key: "other_user_id"
+  
   accepts_nested_attributes_for :gpxes
   
 end
