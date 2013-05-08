@@ -23,6 +23,7 @@
 //= require canvg
 //= require xml2json
 //= require colorbox
+//= require hammer
 
 //= require cycle_app
 

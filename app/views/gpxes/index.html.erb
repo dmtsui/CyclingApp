@@ -27,12 +27,10 @@
 				<div class="span12">
 					<div id="map"><!-- Leaflet generated map here --></div>
 				</div>
-
 			</div>
 			<div class="row">
 				<div class="span12">
-					<svg width=100% height=200 class="outside-svg">
-				  	
+					<svg width=100% height=100% class="outside-svg">
 					</svg>
 				</div>
 			</div>	
@@ -59,11 +57,13 @@
 
 <div class='no-display'>
 	<a href="#panoModal" role="button" id="pano-modal-btn" class="btn" data-toggle="modal">Street View</a>
-	<div id="canvas-div" display="none"></div>
+	<div id="canvas-div"></div>
 	<input type="file" id="files" name="file" />
 </div>
 
 </div>
+
+
 
 
 <script>
@@ -73,25 +73,6 @@ $(function(){
 	CA.Store.Map = L.map('map');
 	L.Icon.Default.imagePath = "/assets";
 	CA.Store.Marker = L.marker([0,0]).addTo(CA.Store.Map);
-	
-	
-	// <div class="span3 top-detail">
-	// 	<div class="row">
-	// 		<div class="span1 offset">
-	// 			
-	// 		</div>
-	// 	</div>
-	// 	<div class="row">
-	// 		<div class="span1 offset">
-	// 			<h3 class="info">Elevation: <div class="elevation">0.0 FT</div> </h3>
-	// 		</div>
-	// 	</div>
-	// 	<div class="row">
-	// 		<div class="span1 offset">
-	// 			<h3 class="info">Distance: <div class="dist">0.0 MILES</div> </h3>
-	// 		</div>
-	// 	</div>
-	// </div>
 	
 	var pos = new google.maps.LatLng( 0, 0);
 
@@ -118,20 +99,6 @@ $(function(){
 			$('.outside-svg').click();
 		}, 2000 );
 	});
-	
-	
-	// $('#pano-modal-btn').click(function() {
-	// 
-	// });
-	
-	
-    // $('#panoModal').css({
-    //     width: "800",
-    //     'margin-left': function () {
-    //         return -($(this).width() / 2);
-    //     }
-    // });
-	
 
 	var gpxes = <%= @gpxes.to_json.html_safe %>;
 	

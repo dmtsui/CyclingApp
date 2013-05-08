@@ -21,8 +21,6 @@ class GpxesController < ApplicationController
   
   def create
     @gpx = current_user.gpxes.build()
-    # @gpx.trk_data = params['image'] if params['image']
-    # params.delete('image')
     params.delete('gpx')
     params.delete('action')
     params.delete('controller')

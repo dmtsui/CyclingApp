@@ -15,7 +15,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		this.HEIGHT = 200,
 		this.MARGINS = {top: 20, right: 20, bottom: 20, left: 30};
 		this.vis = d3.select('.outside-svg') .attr("viewBox", "0 0 1200 200");
-
 		
 		$panoBtn = $('#pano-modal-btn');
 		
@@ -29,7 +28,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		});
 
-		
 		this.sv = new google.maps.StreetViewService();
 		
 		this.vis.on('mousemove', function(d) { 
@@ -39,7 +37,19 @@ CA.Views.GpxGraph = Backbone.View.extend({
 									CA.Store.CurrentDatum = datum;
 								});
 				//.on('mouseout', function(){ CA.Store.Marker.openPopup(); });
-
+		this.vis.on('touchmove', function(evt) {
+									$('body').on('touchmove', that.preventDefault);
+									var datum = that.setInfo(d3.mouse(this));
+									that.displayInfo(datum); 
+									CA.Store.CurrentDatum = datum;
+								})
+			.on('touchend', function(){
+				$('body').off('touchmove', that.preventDefault);
+			});
+	},
+	
+	preventDefault: function (evt){
+		evt.preventDefault();
 	},
 	
 	render: function(xfunc, yfunc){
@@ -84,8 +94,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		var latLng =  new L.LatLng(xs/5, ys/5);
 		
-		return latLng;
-		
+		return latLng;	
 	},
 	
 	captureMap: function(){
@@ -113,7 +122,18 @@ CA.Views.GpxGraph = Backbone.View.extend({
 
 			var svg = serializer.serializeToString(s);
 			ctx.drawSvg(svg,parseInt(m[1]),parseInt(m[2]));
-
+			
+			$canvas = $(canvas);
+			var thumb_width = 500;
+			var thumb_height = 300
+			var center = [ parseFloat($canvas.attr('width'))/2, parseFloat($canvas.attr('height'))/2 ];
+			var top_left_corner = [ center[0] - thumb_width/2, center[1] - thumb_height/2 ]
+			
+			var crop_data = ctx.getImageData(top_left_corner[0], top_left_corner[1],
+											  thumb_width, thumb_height);
+			$canvas.attr({ height: thumb_height, width: thumb_width });
+			ctx.putImageData(crop_data, 0, 0)
+			
 			that.model.save({'image': $('#mini-map')[0].toDataURL()}, {patch: true});
 
 		  }

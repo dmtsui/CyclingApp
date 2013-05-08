@@ -2,6 +2,9 @@
 <html>
 <head>
   <title>CyclingApp</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <%= stylesheet_link_tag    "application", :media => "all" %>
   <%= javascript_include_tag "application" %>
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
@@ -11,13 +14,9 @@
 	<header id="user_nav" class="navbar navbar-fixed-top navbar-inverse">
 	      <div class="navbar-inner">
 	        <div class="container">
-	          <%= link_to "CyclingApp", '#', id: "logo" %>
-	          <nav>
-	            <ul class="nav pull-right">	    		  	
-
-				  
+	          <%= link_to "CyclingApp", '#', id: "logo" %>		  
 				  <% if user_signed_in? %>
-				  
+				  <ul class="nav pull-right">	 
 					  <li class="dropdown">
 					     <a class="dropdown-toggle username"
 					        data-toggle="dropdown"
@@ -35,13 +34,12 @@
 					       
 					     </ul>
 					   </li>
-					  
-					  <div id='file' class="btn">New Ride!</div>
-				  <% end %>
-				  
-				  	
-	            </ul>
-	          </nav>
+					   <li>
+						   <div id='file' class="btn">New Ride!</div>
+					   </li>
+
+	              </ul>
+				  <% end %>  
 	        </div>
 	      </div>
 	</header>

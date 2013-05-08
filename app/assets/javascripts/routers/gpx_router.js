@@ -58,12 +58,11 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		
 		if (that.gpxGraph !== undefined){
 			CA.Store.Marker.off('click');
-			// CA.Store.Marker.unbindPopup()
+
 			that.gpxGraph.vis.on('mousemove', null);
 			that.gpxGraph.vis.on('mouseout', null);
-			
-			//$('.outside-svg').off('mouseout');
-			//d3.select('.outside-svg').off('mouseout');
+			that.gpxGraph.vis.on('touchmove', null);
+
 			that.gpxGraph.remove();
 		}
 		
