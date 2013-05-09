@@ -56,7 +56,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 				'lat': position.coords.latitude,
 				'lon': position.coords.longitude,
 				'ele': position.coords.altitude,
-		  'timestamp': new Date( position.timestamp ),
+		  	   'time': new Date( position.timestamp ),
 			//   'speed': position.coords.speed,
 			// 'heading': position.coords.heading
 		});
@@ -64,7 +64,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		$('.lat').html(trkpt.get('lat'));
 		$('.lon').html(trkpt.get('lon'));
 		$('.ele').html(trkpt.get('ele'));
-		$('.time').html(trkpt.get('timestamp'));
+		$('.time').html(trkpt.get('time'));
 		//$('.speed').html( position.coords.speed );
 		//$('.heading').html( position.coords.heading );
 		

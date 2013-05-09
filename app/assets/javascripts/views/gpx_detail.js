@@ -33,7 +33,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		if (navigator.userAgent.match(/iPad|iPhone|iPad/i) != null){
 			this.vis.on('touchmove', function(evt) {
 										$('body').on('touchmove', that.preventDefault);
-										var datum = that.setInfo(d3.mouse(this));
+										var datum = that.setInfo(d3.touches(this));
 										that.displayInfo(datum); 
 										CA.Store.CurrentDatum = datum;
 									})
@@ -47,8 +47,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 										CA.Store.CurrentDatum = datum;
 									});			
 		}
-		
-
 	},
 	
 	preventDefault: function (evt){
@@ -189,7 +187,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.Marker.bindPopup("StartScrubbing").openPopup();	
 
 	},
-	
 	
 	calcSpeed: function (currentTime, lastTime, dist) {
 		var time = parseInt(currentTime - lastTime)/(3600000);
