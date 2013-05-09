@@ -171,7 +171,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 
 		CA.Store.Map.setView( latLng, 11);
 		L.tileLayer('http://spaceclaw.stamen.com/toner/{z}/{x}/{y}.png', {
-		    maxZoom: 11,
+		    maxZoom: 14,
 			minZoom: 11
 		}).addTo(CA.Store.Map);
 		
