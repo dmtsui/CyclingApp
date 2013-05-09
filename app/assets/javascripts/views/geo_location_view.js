@@ -41,7 +41,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 	
 	getGeoData: function(that){
 		debugger
-		navigator.geolocation.getCurrentPosition(that.parseGeoData, that.geoError);
+		navigator.geolocation.getCurrentPosition(that.parseGeoData, that.geoError, {enableHighAccuracy: true});
 	},
 	
 	parseGeoData: function(position){
@@ -58,8 +58,8 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		
 		$('.lat').html(trkpt.get('lat'));
 		$('.lon').html(trkpt.get('lon'));
-		$('ele').html(trkpt.get('ele'));
-		$('time').html(trkpt.get('timestamp'));
+		$('.ele').html(trkpt.get('ele'));
+		$('.time').html(trkpt.get('timestamp'));
 		$('.speed').html(trkpt.get('speed'));
 		$('.heading').html(trkpt.get('heading'));
 		
