@@ -6,7 +6,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 	},
 	
 	events: {
-		'click .geo-start': "startRecord"
+		'click .geo-start': "getGeoData"
 	},
 	
 	initialize: function(){
@@ -39,9 +39,9 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		window.setInterval(that.getGeoData, 3000, that);
 	},
 	
-	getGeoData: function(that){
-		debugger
-		navigator.geolocation.getCurrentPosition(that.parseGeoData, that.geoError, {enableHighAccuracy: true});
+	getGeoData: function(){
+		var that = this;
+		navigator.geolocation.watchPosition(that.parseGeoData, that.geoError, {enableHighAccuracy: true});
 	},
 	
 	parseGeoData: function(position){
