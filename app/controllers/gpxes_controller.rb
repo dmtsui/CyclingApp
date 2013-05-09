@@ -37,7 +37,6 @@ class GpxesController < ApplicationController
   def patch
     @gpx = Gpx.find(params[:id])
     @gpx.trk_data = params[:image]
-    p "updated!"
     if @gpx.save
       render json: {}
     else
@@ -50,7 +49,6 @@ class GpxesController < ApplicationController
     @gpx = Gpx.find(params[:id])
     data = JSON.parse(@gpx[:data])
     data[:id] = @gpx[:id]
-    #debugger
     render json: data
   end
   
