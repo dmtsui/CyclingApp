@@ -10,7 +10,6 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		
 	},
 	
-	
 	feed: function(){
 		var that = this;
 		
@@ -27,6 +26,11 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 			collection: CA.Store.Gpxes
 		});
 		$('#feed-container').html(gpxesFeedList.render().$el);	
+		CA.Store.GeoLocation = new CA.Models.Gpx();
+		var geoView = new CA.Views.GeoLocationView({
+			model: CA.Store.GeoLocation
+		});
+		$('#tab3').html(geoView.render().$el);	
 		
 		
 	},

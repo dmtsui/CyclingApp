@@ -42,7 +42,6 @@ CA.Views.GpxGraph = Backbone.View.extend({
 				});
 		} else {
 			this.vis.on('mousemove', function(d) { 
-										//CA.Store.Marker.openPopup();
 										var datum = that.setInfo(d3.mouse(this));
 										that.displayInfo(datum); 
 										CA.Store.CurrentDatum = datum;
