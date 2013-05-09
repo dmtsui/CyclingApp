@@ -33,7 +33,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		var that = this;
 		navigator.geolocation.clearWatch( that.watchId );
 		console.log('savingGeoData');
-		CA.Helpers.GpxUploadView.calcBounds(that.model);	
+		that.model.calcBounds();	
 		that.model.save({}, {
 			success: function (gpx){
 				console.log("success hit");
@@ -65,8 +65,8 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		$('.lon').html(trkpt.get('lon'));
 		$('.ele').html(trkpt.get('ele'));
 		$('.time').html(trkpt.get('timestamp'));
-		$('.speed').html( position.coords.speed );
-		$('.heading').html( position.coords.heading );
+		//$('.speed').html( position.coords.speed );
+		//$('.heading').html( position.coords.heading );
 		
 		that.model.get('trk').get('trkseg').get('trkpts').add(trkpt);
 	},

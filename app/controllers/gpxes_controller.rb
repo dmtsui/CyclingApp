@@ -25,6 +25,7 @@ class GpxesController < ApplicationController
     params.delete('action')
     params.delete('controller')
     @gpx.data = params.to_json
+    debugger
     if @gpx.save
       data = JSON.parse(@gpx[:data])
       data[:id] = @gpx[:id]

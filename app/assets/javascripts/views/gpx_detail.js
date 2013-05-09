@@ -62,7 +62,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		that.circle = this.vis.append('circle').attr('r', 10);
 		that.calcBounds();
 		var data_set = CA.Helpers.Cluster.cluster(that.setTrkpts(),1)
-		
+		//var data_set = that.setTrkpts();
 		that.setMap();
 
 		that.setBounds().setAxis().drawAxis();		

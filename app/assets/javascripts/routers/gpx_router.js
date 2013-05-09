@@ -30,7 +30,7 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		var geoView = new CA.Views.GeoLocationView({
 			model: CA.Store.GeoLocation
 		});
-		$('#tab3').html(geoView.render().$el);	
+		$('.geo-body').html(geoView.render().$el);	
 		
 		
 	},
@@ -75,7 +75,6 @@ CA.Routers.GpxRouter = Backbone.Router.extend({
 		});
 		
 		that.$rootEl.html(that.gpxGraph.$el);
-		//CA.Store.Trkpts = CA.Helpers.Cluster.cluster(gpxGraph.setTrkpts(),2);
 		
 		that.gpxGraph.render(that.gpxGraph.setDist, that.gpxGraph.setEle);	
 	}
