@@ -30,22 +30,26 @@ CA.Views.GpxGraph = Backbone.View.extend({
 
 		this.sv = new google.maps.StreetViewService();
 		
-		this.vis.on('mousemove', function(d) { 
-									//CA.Store.Marker.openPopup();
-									var datum = that.setInfo(d3.mouse(this));
-									that.displayInfo(datum); 
-									CA.Store.CurrentDatum = datum;
-								});
-				//.on('mouseout', function(){ CA.Store.Marker.openPopup(); });
-		this.vis.on('touchmove', function(evt) {
-									$('body').on('touchmove', that.preventDefault);
-									var datum = that.setInfo(d3.mouse(this));
-									that.displayInfo(datum); 
-									CA.Store.CurrentDatum = datum;
-								})
-			.on('touchend', function(){
-				$('body').off('touchmove', that.preventDefault);
-			});
+		if (navigator.userAgent.match(/iPad|iPhone|iPad/i) != null){
+			this.vis.on('touchmove', function(evt) {
+										$('body').on('touchmove', that.preventDefault);
+										var datum = that.setInfo(d3.mouse(this));
+										that.displayInfo(datum); 
+										CA.Store.CurrentDatum = datum;
+									})
+				.on('touchend', function(){
+					$('body').off('touchmove', that.preventDefault);
+				});
+		} else {
+			this.vis.on('mousemove', function(d) { 
+										//CA.Store.Marker.openPopup();
+										var datum = that.setInfo(d3.mouse(this));
+										that.displayInfo(datum); 
+										CA.Store.CurrentDatum = datum;
+									});			
+		}
+		
+
 	},
 	
 	preventDefault: function (evt){
