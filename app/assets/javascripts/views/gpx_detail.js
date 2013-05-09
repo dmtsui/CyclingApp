@@ -32,8 +32,11 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		if (navigator.userAgent.match(/iPad|iPhone|iPad/i) != null){
 			this.vis.on('touchmove', function(evt) {
+				var coord = d3.touches(this)[0];
+										//console.log("coords are: " + coord);
 										$('body').on('touchmove', that.preventDefault);
-										var datum = that.setInfo(d3.touches(this));
+										var datum = that.setInfo(d3.touches(this)[0]);
+
 										that.displayInfo(datum); 
 										CA.Store.CurrentDatum = datum;
 									})
