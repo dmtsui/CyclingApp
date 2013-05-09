@@ -9,7 +9,7 @@ CA.Helpers.GpxUploadView = {
 		CA.Store.Reader.onload = function (evt){
 			var data = that.parseXML(evt.target.result);
 			var gpx = new CA.Models.Gpx(data.gpx);
-			that.calcBounds(gpx);	
+			CA.Helpers.GpxUploadView.calcBounds(gpx);	
 			gpx.save({}, {
 				success: function (gpx){
 					console.log("success hit");

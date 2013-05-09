@@ -26,12 +26,6 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 	    var that = this;
 	    var renderedContent = JST["gpx/geo_location"]();
 	    that.$el.html(renderedContent);
-		// that.$lat = $('.lat');
-	// 	that.$lon = $('.lon');
-	// 	that.$ele = $('.ele');
-	// 	that.$time = $('time');
-	// 	that.$speed = $('.speed');
-	// 	that.$heading = $('heading');
 	    return that;
 	},
 	
@@ -39,6 +33,15 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		var that = this;
 		navigator.geolocation.clearWatch( that.watchId );
 		console.log('savingGeoData');
+		CA.Helpers.GpxUploadView.calcBounds(that.model);	
+		that.model.save({}, {
+			success: function (gpx){
+				console.log("success hit");
+				CA.Store.Gpxes.add(gpx);
+				$('#file').text("New Ride!");
+				CA.Store.Router.navigate("#/gpxes/"+gpx.get('id'));
+			}
+		});
 	},
 	
 	getGeoData: function(){
@@ -62,8 +65,8 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		$('.lon').html(trkpt.get('lon'));
 		$('.ele').html(trkpt.get('ele'));
 		$('.time').html(trkpt.get('timestamp'));
-		// $('.speed').html(trkpt.get('speed'));
-		// $('.heading').html(trkpt.get('heading'));
+		$('.speed').html( position.coords.speed );
+		$('.heading').html( position.coords.heading );
 		
 		that.model.get('trk').get('trkseg').get('trkpts').add(trkpt);
 	},
