@@ -6,7 +6,8 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 	},
 	
 	events: {
-		'click .geo-start': "getGeoData"
+		'click .geo-start': "getGeoData",
+		'click .geo-stop': "saveGeoData"
 	},
 	
 	initialize: function(){
@@ -17,7 +18,7 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 		that.trkpts = new CA.Collections.Trkpts();
 		
 		that.trkseg.set('trkpts', that.trkpts);
-		that.trkseg.set('trkseg', that.trkseg);
+		that.trk.set('trkseg', that.trkseg);
 		that.model.set('trk', that.trk);	
 	},
 	
@@ -25,23 +26,24 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 	    var that = this;
 	    var renderedContent = JST["gpx/geo_location"]();
 	    that.$el.html(renderedContent);
-		that.$lat = $('.lat');
-		that.$lon = $('.lon');
-		that.$ele = $('.ele');
-		that.$time = $('time');
-		that.$speed = $('.speed');
-		that.$heading = $('heading');
+		// that.$lat = $('.lat');
+	// 	that.$lon = $('.lon');
+	// 	that.$ele = $('.ele');
+	// 	that.$time = $('time');
+	// 	that.$speed = $('.speed');
+	// 	that.$heading = $('heading');
 	    return that;
 	},
 	
-	startRecord: function(){
+	saveGeoData: function(){
 		var that = this;
-		window.setInterval(that.getGeoData, 3000, that);
+		navigator.geolocation.clearWatch( that.watchId );
+		console.log('savingGeoData');
 	},
 	
 	getGeoData: function(){
 		var that = this;
-		navigator.geolocation.watchPosition(that.parseGeoData, that.geoError, {enableHighAccuracy: true});
+		that.watchId = navigator.geolocation.watchPosition(that.parseGeoData.bind(that), that.geoError, {enableHighAccuracy: true});
 	},
 	
 	parseGeoData: function(position){
@@ -52,16 +54,16 @@ CA.Views.GeoLocationView = Backbone.View.extend({
 				'lon': position.coords.longitude,
 				'ele': position.coords.altitude,
 		  'timestamp': new Date( position.timestamp ),
-			  'speed': position.coords.speed,
-			'heading': position.coords.heading
+			//   'speed': position.coords.speed,
+			// 'heading': position.coords.heading
 		});
 		
 		$('.lat').html(trkpt.get('lat'));
 		$('.lon').html(trkpt.get('lon'));
 		$('.ele').html(trkpt.get('ele'));
 		$('.time').html(trkpt.get('timestamp'));
-		$('.speed').html(trkpt.get('speed'));
-		$('.heading').html(trkpt.get('heading'));
+		// $('.speed').html(trkpt.get('speed'));
+		// $('.heading').html(trkpt.get('heading'));
 		
 		that.model.get('trk').get('trkseg').get('trkpts').add(trkpt);
 	},
