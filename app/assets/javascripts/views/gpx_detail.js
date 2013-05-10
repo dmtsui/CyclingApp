@@ -32,8 +32,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		
 		if (navigator.userAgent.match(/iPad|iPhone|iPad/i) != null){
 			this.vis.on('touchmove', function(evt) {
-				var coord = d3.touches(this)[0];
-										//console.log("coords are: " + coord);
+										var coord = d3.touches(this)[0];
 										$('body').on('touchmove', that.preventDefault);
 										var datum = that.setInfo(d3.touches(this)[0]);
 
