@@ -186,7 +186,7 @@ CA.Views.GpxGraph = Backbone.View.extend({
 		CA.Store.Polyline.addTo(CA.Store.Map);
 		CA.Store.Marker.setLatLng( latLng );
 		CA.Store.Marker.update();
-		CA.Store.Marker.bindPopup("StartScrubbing").openPopup();	
+		CA.Store.Marker.bindPopup("Click on me for Street View. /n Scrub graph to update metrics.").openPopup();	
 
 	},
 	
