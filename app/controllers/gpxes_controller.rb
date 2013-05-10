@@ -1,11 +1,11 @@
 class GpxesController < ApplicationController
-  before_filter :authenticate_user!
+  before_filter :current_or_guest_user
   
   respond_to :json
   respond_to :html, only:[:index]
   
   def index
-    @gpxes = current_user.gpxes.all
+    @gpxes = current_or_guest_user.gpxes.all
     @gpxes.map! do |gpx| 
       data = JSON.parse(gpx[:data])
       data.delete('trk')
@@ -20,12 +20,12 @@ class GpxesController < ApplicationController
   end
   
   def create
-    @gpx = current_user.gpxes.build()
+    @gpx = current_or_guest_user.gpxes.build()
     params.delete('gpx')
     params.delete('action')
     params.delete('controller')
     @gpx.data = params.to_json
-    debugger
+    #debugger
     if @gpx.save
       data = JSON.parse(@gpx[:data])
       data[:id] = @gpx[:id]
@@ -54,7 +54,7 @@ class GpxesController < ApplicationController
   end
   
   def destroy
-    @gpx = current_user.gpxes.where(id: params[:id])
+    @gpx = current_or_guest_user.gpxes.where(id: params[:id])
     if @gpx.destroy
       redirect_to gpxes_url
     else
